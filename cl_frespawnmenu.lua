@@ -80,7 +80,7 @@ local function openFreMenu()
 	global_div:SetDividerWidth( 4 )
 
 	local MainPanel = vgui.Create( 'DPanel', global_div )
-	MainPanel:SetWide( spawn_w * 0.7 )
+	MainPanel:SetWide( spawn_w )
 	MainPanel.Paint = nil
 
 	local ToolPanel = vgui.Create( 'DPanel', global_div )
@@ -89,7 +89,7 @@ local function openFreMenu()
 	end
 
 	global_div:SetLeft( MainPanel )
-	global_div:SetLeftWidth( spawn_w - 150 ) 
+	global_div:SetLeftWidth( spawn_w - 160 ) 
 	global_div:SetLeftMin( spawn_w * 0.8 )
 	global_div:SetRight( ToolPanel )
 	global_div:SetRightMin( 120 )
@@ -111,10 +111,17 @@ local function openFreMenu()
 		frePanel( self, w, h )
 	end
 
-	local action_panel_content = vgui.Create( 'DPanel', action_panel )
-	action_panel_content:Dock( FILL )
-	action_panel_content:DockMargin( 6, 6, 6, 6 )
+	local action_panel_div = vgui.Create( 'DHorizontalDivider', action_panel )
+	action_panel_div:Dock( FILL )
+	action_panel_div:DockMargin( 6, 6, 6, 6 )
+	action_panel_div:SetDividerWidth( 4 )
+
+	local action_panel_content = vgui.Create( 'DPanel', action_panel_div )
 	action_panel_content.Paint = nil
+
+	action_panel_div:SetLeft( action_panel_content )
+	action_panel_div:SetLeftWidth( spawn_div:GetWide() )
+	action_panel_div:SetRightMin( 0 )
 
 	local tab_panel_sp = vgui.Create( 'DHorizontalScroller', tabs_panel )
 	tab_panel_sp:Dock( FILL )
@@ -142,6 +149,9 @@ local function openFreMenu()
 			content:Dock( FILL )
 
 			RunConsoleCommand( 'frespawnmenu_content', name )
+
+			action_panel_div:SetRightMin( 0 )
+			action_panel_div:SetLeftWidth( spawn_w )
 		end
 		btn_item.Paint = function( self, w, h )
 			freButton( self, w, h, name )
@@ -204,13 +214,14 @@ local function openFreMenu()
 						FreSpawnMenu_cp_sp:Remove()
 					end
 					
-					FreSpawnMenu_cp_sp = vgui.Create( 'DScrollPanel', action_panel_content )
-					FreSpawnMenu_cp_sp:SetWide( action_panel_content:GetWide() * 0.32 )
-					FreSpawnMenu_cp_sp:Dock( RIGHT )
+					FreSpawnMenu_cp_sp = vgui.Create( 'DScrollPanel', action_panel_div )
 					FreSpawnMenu_cp_sp:DockMargin( 6, 0, 0, 0 )
 					FreSpawnMenu_cp_sp.Paint = function( self, w, h )
 						draw.RoundedBox( 6, 0, 0, w, h, Color(255,255,255,100) )
 					end
+
+					action_panel_div:SetRight( FreSpawnMenu_cp_sp )
+					action_panel_div:SetRightMin( math.min( 300, spawn_w * 0.32 ) )
 
 					local cp = vgui.Create( 'ControlPanel', FreSpawnMenu_cp_sp )
 					cp:Dock( FILL )
