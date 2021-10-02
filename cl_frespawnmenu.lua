@@ -190,7 +190,18 @@ local function openFreMenu()
 	tool_sp:DockMargin( 6, 6, 6, 6 )
 	tool_sp:GetVBar():SetWide( 0 )
 
-	for _, tool in ipairs( spawnmenu.GetTools() ) do
+	local tool_CategoryButton = vgui.Create( 'DButton', ToolPanel )
+	tool_CategoryButton:Dock( TOP )
+	tool_CategoryButton:DockMargin( 4, 4, 4, -2 )
+	tool_CategoryButton:SetTall( 18 )
+	tool_CategoryButton:SetText( 'Categories' )
+	tool_CategoryButton.Paint = function( self, w, h )
+		freButton( self, w, h )
+	end
+
+	local function tools_create( tool )
+		tool_sp:Clear()
+
 		for _, category in ipairs( tool.Items ) do
 			local CollapsibleTool = vgui.Create( 'DCollapsibleCategory', tool_sp )
 			CollapsibleTool:Dock( TOP )
@@ -240,8 +251,28 @@ local function openFreMenu()
 		end
 	end
 
+	tool_CategoryButton.DoClick = function()
+		local DM = DermaMenu()
+
+		for _, tool in ipairs( spawnmenu.GetTools() ) do
+			DM:AddOption( tool.Label, function()
+				soundPlay()
+
+				tools_create( tool )
+			end ):SetIcon( tool.Icon )
+		end
+
+		DM:Open()
+	end
+
+	for _, tool in ipairs( spawnmenu.GetTools() ) do
+		if ( _ == 1 ) then
+			tools_create( tool )
+		end
+	end
+
 	for k, v in SortedPairsByMemberValue( spawnmenu.GetCreationTabs(), 'Order' ) do
-		if ( k == '#spawnmenu.content_tab' ) then
+		if ( k == GetConVar( 'frespawnmenu_content' ):GetString() ) then
 			local content = v.Function()
 			content:SetParent( action_panel_content )
 			content:Dock( FILL )
