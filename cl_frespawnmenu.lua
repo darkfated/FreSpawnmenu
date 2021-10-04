@@ -135,12 +135,13 @@ local function openFreMenu()
 		btn_item:SetWide( surface.GetTextSize( name ) + 44 )
 		btn_item:SetText( name )
 		-- btn_item:SetIcon( v.Icon )
-		btn_item.DoClick = function( self, w, h )
-			soundPlay( 'buttons/lightswitch2.wav' )
 
+		local function OpenContent()
 			if ( GetConVar( 'frespawnmenu_content' ):GetString() == name ) then
 				return
 			end
+
+			soundPlay( 'buttons/lightswitch2.wav' )
 
 			action_panel_content:Clear()
 
@@ -153,16 +154,24 @@ local function openFreMenu()
 			action_panel_div:SetRightMin( 0 )
 			action_panel_div:SetLeftWidth( spawn_w )
 		end
+
+		btn_item.DoClick = function( self, w, h )
+			OpenContent()
+		end
 		btn_item.Paint = function( self, w, h )
 			freButton( self, w, h, name )
 		end
 
-		local icon_pan = vgui.Create( 'DPanel', tab_panel_sp )
+		local icon_pan = vgui.Create( 'DButton', tab_panel_sp )
 		icon_pan:SetWide( 22 )
+		icon_pan:SetText( '' )
 		icon_pan.Paint = function( self, w, h )
-			surface.SetDrawColor( color_white )
+			surface.SetDrawColor( self.Depressed and GetConVar( 'frespawnmenu_content' ):GetString() != name and Color(230,230,230) or color_white )
 			surface.SetMaterial( Material( v.Icon ) )
 			surface.DrawTexturedRect( 2, h * 0.5 - 10, w - 4, 20 )
+		end
+		icon_pan.DoClick = function()
+			OpenContent()
 		end
 
 		tab_panel_sp:AddPanel( icon_pan )
