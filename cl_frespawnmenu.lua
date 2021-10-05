@@ -324,3 +324,11 @@ hook.Add( 'OnSpawnMenuClose', 'FreSpawnMenuClose', function()
 		return false
 	end
 end )
+
+// Console command to recreate the menu
+
+concommand.Add( 'frespawnmenu_rebuild', function()
+	FreSpawnMenu:Remove()
+
+	FreSpawnMenu = nil
+end )
