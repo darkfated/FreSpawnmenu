@@ -208,6 +208,12 @@ local function openFreMenu()
 		freButton( self, w, h )
 	end
 
+	local tool_cp_sp = vgui.Create( 'DScrollPanel', action_panel_div )
+	tool_cp_sp:DockMargin( 6, 0, 0, 0 )
+	tool_cp_sp.Paint = function( self, w, h )
+		draw.RoundedBox( 6, 0, 0, w, h, Color(255,255,255,100) )
+	end
+
 	local function tools_create( tool )
 		tool_sp:Clear()
 
@@ -230,20 +236,12 @@ local function openFreMenu()
 				tool_btn.DoClick = function()
 					soundPlay()
 
-					if ( IsValid( FreSpawnMenu_cp_sp ) ) then
-						FreSpawnMenu_cp_sp:Remove()
-					end
-					
-					FreSpawnMenu_cp_sp = vgui.Create( 'DScrollPanel', action_panel_div )
-					FreSpawnMenu_cp_sp:DockMargin( 6, 0, 0, 0 )
-					FreSpawnMenu_cp_sp.Paint = function( self, w, h )
-						draw.RoundedBox( 6, 0, 0, w, h, Color(255,255,255,100) )
-					end
+					tool_cp_sp:Clear()
 
-					action_panel_div:SetRight( FreSpawnMenu_cp_sp )
+					action_panel_div:SetRight( tool_cp_sp )
 					action_panel_div:SetRightMin( math.min( 300, spawn_w * 0.32 ) )
 
-					local cp = vgui.Create( 'ControlPanel', FreSpawnMenu_cp_sp )
+					local cp = vgui.Create( 'ControlPanel', tool_cp_sp )
 					cp:Dock( FILL )
 					cp:SetLabel( item.Text )
 
