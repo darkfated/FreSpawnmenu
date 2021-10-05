@@ -236,7 +236,9 @@ local function openFreMenu()
 				tool_btn.DoClick = function()
 					soundPlay()
 
-					RunConsoleCommand( 'gmod_tool', cnt )
+					-- RunConsoleCommand( 'gmod_tool', cnt )
+
+					spawnmenu.ActivateTool( item.ItemName )
 
 					tool_cp_sp:Clear()
 
@@ -276,6 +278,8 @@ local function openFreMenu()
 
 		DM:Open()
 	end
+
+	// Setting standard settings when opening for the first time
 
 	for _, tool in ipairs( spawnmenu.GetTools() ) do
 		if ( _ == 1 ) then
