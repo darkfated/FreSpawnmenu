@@ -238,23 +238,26 @@ local function openFreMenu()
 
 					RunConsoleCommand( 'gmod_tool', cnt )
 
-					if ( item.CPanelFunction != nil ) then
-						item.CPanelFunction( cp )
-					end
-
 					tool_cp_sp:Clear()
 
-					action_panel_div:SetRight( tool_cp_sp )
-					action_panel_div:SetRightMin( math.min( 300, spawn_w * 0.32 ) )
+					if ( item.CPanelFunction != nil ) then
+						action_panel_div:SetRight( tool_cp_sp )
+						action_panel_div:SetRightMin( math.min( 300, spawn_w * 0.32 ) )
+	
+						local cp = vgui.Create( 'ControlPanel', tool_cp_sp )
+						cp:Dock( FILL )
+						cp:SetLabel( item.Text )
 
-					local cp = vgui.Create( 'ControlPanel', tool_cp_sp )
-					cp:Dock( FILL )
-					cp:SetLabel( item.Text )
-
-					local PanSplit = vgui.Create( 'DPanel', cp )
-					PanSplit:SetTall( 2 )
-					PanSplit:Dock( TOP )
-					PanSplit.Paint = nil
+						item.CPanelFunction( cp )
+	
+						local PanSplit = vgui.Create( 'DPanel', cp )
+						PanSplit:SetTall( 2 )
+						PanSplit:Dock( TOP )
+						PanSplit.Paint = nil
+					else
+						action_panel_div:SetRightMin( 0 )
+						action_panel_div:SetLeftWidth( spawn_w )
+					end
 				end
 			end
 		end
@@ -310,7 +313,7 @@ hook.Add( 'OnSpawnMenuClose', 'FreSpawnMenuClose', function()
 		RememberCursorPosition()
 
 		FreSpawnMenu:SetVisible( false )
-		-- FreSpawnMenu:Remove()
+		FreSpawnMenu:Remove()
 
 		hook.Call( 'SpawnMenuClosed', self )
 
