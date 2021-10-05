@@ -1,5 +1,6 @@
 CreateClientConVar( 'frespawnmenu', 1, true )
 CreateClientConVar( 'frespawnmenu_content', '#spawnmenu.content_tab', true )
+CreateClientConVar( 'frespawnmenu_blur', 1, true )
 
 local function DrawRect( x, y, w, h, t )
 	if ( not t ) then
@@ -19,18 +20,20 @@ local color_blue = Color(47,96,255)
 local scrw, scrh = ScrW(), ScrH()
 
 function freBlur( panel, amount )
-	local x, y = panel:LocalToScreen( 0, 0 )
+	if ( GetConVar( 'frespawnmenu_blur' ):GetBool() ) then
+		local x, y = panel:LocalToScreen( 0, 0 )
 
-	surface.SetDrawColor( color_white )
-	surface.SetMaterial( Mat )
+		surface.SetDrawColor( color_white )
+		surface.SetMaterial( Mat )
 
-	for i = 1, 3 do
-		Mat:SetFloat( '$blur', i * 0.3 * ( amount or 8 ) )
-		Mat:Recompute()
+		for i = 1, 3 do
+			Mat:SetFloat( '$blur', i * 0.3 * ( amount or 8 ) )
+			Mat:Recompute()
 
-		render.UpdateScreenEffectTexture()
+			render.UpdateScreenEffectTexture()
 
-		surface.DrawTexturedRect( x * -1, y * -1, scrw, scrh )
+			surface.DrawTexturedRect( x * -1, y * -1, scrw, scrh )
+		end
 	end
 end
 
