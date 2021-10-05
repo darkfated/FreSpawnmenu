@@ -236,6 +236,12 @@ local function openFreMenu()
 				tool_btn.DoClick = function()
 					soundPlay()
 
+					RunConsoleCommand( 'gmod_tool', cnt )
+
+					if ( item.CPanelFunction != nil ) then
+						item.CPanelFunction( cp )
+					end
+
 					tool_cp_sp:Clear()
 
 					action_panel_div:SetRight( tool_cp_sp )
@@ -245,16 +251,10 @@ local function openFreMenu()
 					cp:Dock( FILL )
 					cp:SetLabel( item.Text )
 
-					if ( item.CPanelFunction != nil ) then
-						item.CPanelFunction( cp )
-					end
-
 					local PanSplit = vgui.Create( 'DPanel', cp )
 					PanSplit:SetTall( 2 )
 					PanSplit:Dock( TOP )
 					PanSplit.Paint = nil
-
-					RunConsoleCommand( 'gmod_tool', cnt )
 				end
 			end
 		end
