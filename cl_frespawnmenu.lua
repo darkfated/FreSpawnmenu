@@ -64,6 +64,8 @@ local function soundPlay( snd )
 end
 
 local function openFreMenu()
+	scrw, scrh = ScrW(), ScrH() -- Resetting the permission when recreating the menu
+
 	achievements.SpawnMenuOpen()
 
 	local spawn_w = math.min( scrw - 10, scrw * 0.92 )
