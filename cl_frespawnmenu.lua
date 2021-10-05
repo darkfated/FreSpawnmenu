@@ -217,6 +217,8 @@ local function openFreMenu()
 		draw.RoundedBox( 6, 0, 0, w, h, Color(255,255,255,100) )
 	end
 
+	action_panel_div:SetRight( tool_cp_sp )
+
 	local function tools_create( tool )
 		tool_sp:Clear()
 
@@ -246,7 +248,6 @@ local function openFreMenu()
 					tool_cp_sp:Clear()
 
 					if ( item.CPanelFunction != nil ) then
-						action_panel_div:SetRight( tool_cp_sp )
 						action_panel_div:SetRightMin( math.min( 300, spawn_w * 0.32 ) )
 	
 						local cp = vgui.Create( 'ControlPanel', tool_cp_sp )
