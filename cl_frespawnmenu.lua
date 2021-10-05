@@ -313,7 +313,7 @@ hook.Add( 'OnSpawnMenuClose', 'FreSpawnMenuClose', function()
 		RememberCursorPosition()
 
 		FreSpawnMenu:SetVisible( false )
-		FreSpawnMenu:Remove()
+		-- FreSpawnMenu:Remove()
 
 		hook.Call( 'SpawnMenuClosed', self )
 
