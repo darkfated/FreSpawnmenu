@@ -274,7 +274,8 @@ local function openFreMenu()
 	tool_CategoryButton.DoClick = function()
 		local DM = DermaMenu()
 		DM.Paint = function( self, w, h )
-			frePanel( self, w, h )
+			draw.RoundedBox( 4, 0, 0, w, h, color_gray )
+			draw.RoundedBox( 4, 1, 1, w - 2, h - 2, Color(230,230,230) )
 		end
 
 		for _, tool in ipairs( spawnmenu.GetTools() ) do
