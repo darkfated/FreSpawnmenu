@@ -273,13 +273,20 @@ local function openFreMenu()
 
 	tool_CategoryButton.DoClick = function()
 		local DM = DermaMenu()
+		DM.Paint = function( self, w, h )
+			frePanel( self, w, h )
+		end
 
 		for _, tool in ipairs( spawnmenu.GetTools() ) do
-			DM:AddOption( tool.Label, function()
+			local btn = DM:AddOption( tool.Label, function()
 				soundPlay()
 
 				tools_create( tool )
-			end ):SetIcon( tool.Icon )
+			end )
+			btn:SetIcon( tool.Icon )
+			btn.Paint = nil
+
+			-- DM:AddSpacer()
 		end
 
 		DM:Open()
