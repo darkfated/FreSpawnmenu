@@ -14,7 +14,7 @@ local function DrawRect( x, y, w, h, t )
 end
 
 local Mat = Material( 'pp/blurscreen' )
-local color_white = Color(255, 255, 255)
+local color_white = Color(255,255,255)
 local color_gray = Color(70,70,70,200)
 local color_blue = Color(47,96,255)
 local scrw, scrh = ScrW(), ScrH()
@@ -236,6 +236,7 @@ local function openFreMenu()
 				tool_btn:SetText( item.Text )
 
 				local cnt = item.Controls
+				local name = item.ItemName
 
 				tool_btn.Paint = function( self, w, h )
 					freButton( self, w, h, cnt )
@@ -243,9 +244,7 @@ local function openFreMenu()
 				tool_btn.DoClick = function()
 					soundPlay()
 
-					-- RunConsoleCommand( 'gmod_tool', cnt )
-
-					spawnmenu.ActivateTool( item.ItemName )
+					spawnmenu.ActivateTool( name )
 
 					tool_cp_sp:Clear()
 
@@ -330,8 +329,10 @@ hook.Add( 'OnSpawnMenuClose', 'FreSpawnMenuClose', function()
 	if ( GetConVar( 'frespawnmenu' ):GetBool() ) then
 		RememberCursorPosition()
 
-		FreSpawnMenu:SetVisible( false )
-		-- FreSpawnMenu:Remove()
+		if ( IsValid( FreSpawnMenu ) ) then
+			FreSpawnMenu:SetVisible( false )
+			-- FreSpawnMenu:Remove()
+		end
 
 		hook.Call( 'SpawnMenuClosed', self )
 
@@ -342,7 +343,9 @@ end )
 // Console command to recreate the menu
 
 concommand.Add( 'frespawnmenu_rebuild', function()
-	FreSpawnMenu:Remove()
+	if ( IsValid( FreSpawnMenu ) ) then
+		FreSpawnMenu:Remove()
 
-	FreSpawnMenu = nil
+		FreSpawnMenu = nil
+	end
 end )
