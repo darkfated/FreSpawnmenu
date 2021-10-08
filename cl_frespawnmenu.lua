@@ -256,7 +256,7 @@ local function openFreMenu()
 						cp:SetLabel( item.Text )
 
 						item.CPanelFunction( cp )
-	
+
 						local PanSplit = vgui.Create( 'DPanel', cp )
 						PanSplit:SetTall( 6 )
 						PanSplit:Dock( TOP )
