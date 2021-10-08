@@ -242,6 +242,10 @@ local function openFreMenu()
 					freButton( self, w, h, cnt )
 				end
 				tool_btn.DoClick = function()
+					if ( GetConVar( 'gmod_toolmode' ):GetString() == item.ItemName ) then
+						return
+					end
+
 					soundPlay()
 
 					spawnmenu.ActivateTool( name )
