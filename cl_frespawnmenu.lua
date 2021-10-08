@@ -335,12 +335,17 @@ hook.Add( 'OnSpawnMenuClose', 'FreSpawnMenuClose', function()
 
 		if ( IsValid( FreSpawnMenu ) ) then
 			FreSpawnMenu:SetVisible( false )
-			-- FreSpawnMenu:Remove()
+		end
+
+		if ( IsValid( g_SpawnMenu ) ) then
+			g_SpawnMenu:SetVisible( false )
 		end
 
 		hook.Call( 'SpawnMenuClosed', self )
 
 		return false
+	elseif ( IsValid( FreSpawnMenu ) ) then
+		FreSpawnMenu:Remove()
 	end
 end )
 
@@ -352,4 +357,14 @@ concommand.Add( 'frespawnmenu_rebuild', function()
 
 		FreSpawnMenu = nil
 	end
+end )
+
+// Custom menu settings
+
+hook.Add( 'PopulateToolMenu', 'FreSpawnMenuTool', function()
+	spawnmenu.AddToolMenuOption( 'Utilities', 'User', 'SpawnMenu', 'FreSpawnMenu', '', '', function( panel )
+		panel:AddControl( 'CheckBox', { Label = 'Menu activation status (enabled for operation or not)', Command = 'frespawnmenu' } )
+		panel:AddControl( 'CheckBox', { Label = 'Blur for background', Command = 'frespawnmenu_blur' } )
+		panel:AddControl( 'Button', { Label = 'Rebuild SpawnMenu', Command = 'frespawnmenu_rebuild' } )
+	end )
 end )
