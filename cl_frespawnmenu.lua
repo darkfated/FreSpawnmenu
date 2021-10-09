@@ -173,7 +173,7 @@ local function openFreMenu()
 		icon_pan.Paint = function( self, w, h )
 			surface.SetDrawColor( self.Depressed and GetConVar( 'frespawnmenu_content' ):GetString() != name and Color(230,230,230) or color_white )
 			surface.SetMaterial( Material( v.Icon ) )
-			surface.DrawTexturedRect( 4, h * 0.5 - 8, w - 6, 16 )
+			surface.DrawTexturedRect( 4, h * 0.5 - 8, w - 8, 16 )
 		end
 		icon_pan.DoClick = function()
 			OpenContent()
