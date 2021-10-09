@@ -318,7 +318,19 @@ hook.Add( 'OnSpawnMenuOpen', 'FreSpawnMenuOpen', function()
 		RestoreCursorPosition()
 
 		if ( not IsValid( FreSpawnMenu ) ) then
+			hook.Run( 'PreReloadToolsMenu' )
+
+			spawnmenu.ClearToolMenus()
+
+			hook.Run( 'AddGamemodeToolMenuTabs' )
+			hook.Run( 'AddToolMenuTabs' )
+			hook.Run( 'AddGamemodeToolMenuCategories' )
+			hook.Run( 'AddToolMenuCategories' )
+			hook.Run( 'PopulateToolMenu' )
+
 			openFreMenu()
+
+			hook.Run( 'PostReloadToolsMenu' )
 		else
 			FreSpawnMenu:SetVisible( true )
 		end
