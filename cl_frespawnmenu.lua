@@ -19,7 +19,7 @@ local color_gray = Color(70,70,70,200)
 local color_blue = Color(47,96,255)
 local scrw, scrh = ScrW(), ScrH()
 
-function freBlur( panel, amount )
+local function freBlur( panel, amount )
 	if ( GetConVar( 'frespawnmenu_blur' ):GetBool() ) then
 		local x, y = panel:LocalToScreen( 0, 0 )
 
