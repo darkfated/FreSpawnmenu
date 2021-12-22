@@ -139,7 +139,6 @@ local function openFreMenu()
 		local btn_item = vgui.Create( 'DButton', tab_panel_sp )
 		btn_item:SetWide( surface.GetTextSize( name ) + 44 )
 		btn_item:SetText( name )
-		-- btn_item:SetIcon( v.Icon )
 
 		local function OpenContent()
 			if ( GetConVar( 'frespawnmenu_content' ):GetString() == name ) then
