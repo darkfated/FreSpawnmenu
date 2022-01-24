@@ -17,6 +17,11 @@ local Mat = Material( 'pp/blurscreen' )
 local color_white = Color(255,255,255)
 local color_gray = Color(70,70,70,200)
 local color_blue = Color(47,96,255)
+local color_button = Color(226,226,226)
+local color_panel = Color(202,202,202,200)
+local color_icon_depressed = Color(230,230,230)
+local color_panel_tool_content = Color(255,255,255,100)
+local color_panel_dm = Color(230,230,230)
 local scrw, scrh = ScrW(), ScrH()
 
 local function freBlur( panel, amount )
@@ -48,7 +53,7 @@ end
 
 local function frePanel( self, w, h )
 	freBlur( self )
-	freOutlinedBox( 0, 0, w, h, Color(202,202,202,200), color_gray )
+	freOutlinedBox( 0, 0, w, h, color_panel, color_gray )
 end
 
 local function freButton( self, w, h, name )
@@ -56,7 +61,7 @@ local function freButton( self, w, h, name )
 
 	local bor = self:IsHovered() and 2 or 1
 
-	draw.RoundedBox( 4, bor, bor, w - bor * 2, h - bor * 2, Color(226,226,226) )
+	draw.RoundedBox( 4, bor, bor, w - bor * 2, h - bor * 2, color_button )
 end
 
 local function soundPlay( snd )
@@ -170,7 +175,7 @@ local function openFreMenu()
 		icon_pan:SetWide( 22 )
 		icon_pan:SetText( '' )
 		icon_pan.Paint = function( self, w, h )
-			surface.SetDrawColor( self.Depressed and GetConVar( 'frespawnmenu_content' ):GetString() != name and Color(230,230,230) or color_white )
+			surface.SetDrawColor( self.Depressed and GetConVar( 'frespawnmenu_content' ):GetString() != name and color_icon_depressed or color_white )
 			surface.SetMaterial( Material( v.Icon ) )
 			surface.DrawTexturedRect( 4, h * 0.5 - 8, w - 8, 16 )
 		end
@@ -215,7 +220,7 @@ local function openFreMenu()
 	local tool_cp_sp = vgui.Create( 'DScrollPanel', action_panel_div )
 	tool_cp_sp:DockMargin( 6, 0, 0, 0 )
 	tool_cp_sp.Paint = function( self, w, h )
-		draw.RoundedBox( 6, 0, 0, w, h, Color(255,255,255,100) )
+		draw.RoundedBox( 6, 0, 0, w, h, color_panel_tool_content )
 	end
 
 	action_panel_div:SetRight( tool_cp_sp )
@@ -277,7 +282,7 @@ local function openFreMenu()
 		local DM = DermaMenu()
 		DM.Paint = function( self, w, h )
 			draw.RoundedBox( 4, 0, 0, w, h, color_gray )
-			draw.RoundedBox( 4, 1, 1, w - 2, h - 2, Color(230,230,230) )
+			draw.RoundedBox( 4, 1, 1, w - 2, h - 2, color_panel_dm )
 		end
 
 		for _, tool in ipairs( spawnmenu.GetTools() ) do
