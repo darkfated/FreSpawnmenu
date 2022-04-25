@@ -161,9 +161,6 @@ local function openFreMenu()
 			content:SetSkin( 'fsm' )
 
 			RunConsoleCommand( 'frespawnmenu_content', name )
-
-			action_panel_div:SetRightMin( 0 )
-			action_panel_div:SetLeftWidth( spawn_w )
 		end
 
 		btn_item.DoClick = function( self, w, h )
@@ -271,9 +268,6 @@ local function openFreMenu()
 						PanSplit:SetTall( 6 )
 						PanSplit:Dock( TOP )
 						PanSplit.Paint = nil
-					else
-						action_panel_div:SetRightMin( 0 )
-						action_panel_div:SetLeftWidth( spawn_w )
 					end
 				end
 			end
