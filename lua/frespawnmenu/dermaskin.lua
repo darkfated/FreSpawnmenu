@@ -376,12 +376,12 @@ end
 --[[---------------------------------------------------------
 	Menu
 -----------------------------------------------------------]]
+local color_gray = Color(70,70,70,200)
+local color_panel_dm = Color(230,230,230)
+
 function SKIN:PaintMenu( panel, w, h )
-	if ( panel:GetDrawColumn() ) then
-		self.tex.MenuBG_Column( 0, 0, w, h )
-	else
-		self.tex.MenuBG( 0, 0, w, h )
-	end
+	draw.RoundedBox( 4, 0, 0, w, h, color_gray )
+	draw.RoundedBox( 4, 1, 1, w - 2, h - 2, color_panel_dm )
 end
 
 --[[---------------------------------------------------------

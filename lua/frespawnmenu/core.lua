@@ -21,7 +21,6 @@ local color_button = Color(226,226,226)
 local color_panel = Color(202,202,202,200)
 local color_icon_depressed = Color(230,230,230)
 local color_panel_tool_content = Color(255,255,255,145)
-local color_panel_dm = Color(230,230,230)
 local scrw, scrh = ScrW(), ScrH()
 
 local function freBlur( panel, amount )
@@ -276,10 +275,7 @@ local function openFreMenu()
 
 	tool_CategoryButton.DoClick = function()
 		local DM = DermaMenu()
-		DM.Paint = function( self, w, h )
-			draw.RoundedBox( 4, 0, 0, w, h, color_gray )
-			draw.RoundedBox( 4, 1, 1, w - 2, h - 2, color_panel_dm )
-		end
+		DM:SetSkin( 'fsm' )
 
 		for _, tool in ipairs( spawnmenu.GetTools() ) do
 			local btn = DM:AddOption( tool.Label, function()
