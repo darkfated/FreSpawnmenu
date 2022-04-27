@@ -20,7 +20,7 @@ local color_blue = Color(47,96,255)
 local color_button = Color(226,226,226)
 local color_panel = Color(202,202,202,200)
 local color_icon_depressed = Color(230,230,230)
-local color_panel_tool_content = Color(255,255,255,100)
+local color_panel_tool_content = Color(255,255,255,145)
 local color_panel_dm = Color(230,230,230)
 local scrw, scrh = ScrW(), ScrH()
 
