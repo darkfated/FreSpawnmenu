@@ -303,10 +303,10 @@ end
 --[[---------------------------------------------------------
 	Tree
 -----------------------------------------------------------]]
-function SKIN:PaintTree( panel, w, h )
-	if ( !panel.m_bBackground ) then return end
+local color_panel_tree = Color(255,255,255,145)
 
-	self.tex.Tree( 0, 0, w, h, panel.m_bgColor )
+function SKIN:PaintTree( panel, w, h )
+	draw.RoundedBox( 6, 0, 0, w, h, color_panel_tree )
 end
 
 --[[---------------------------------------------------------
