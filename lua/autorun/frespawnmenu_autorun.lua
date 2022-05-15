@@ -1,7 +1,7 @@
 local inc = SERVER and AddCSLuaFile or include
 
 if ( SERVER ) then
-	resource.AddFile( 'materials/gwenskin/frespawnmenu.png' )
+	resource.AddWorkshop( '2613708971' )
 end
 
 inc( 'frespawnmenu/dermaskin.lua' )
