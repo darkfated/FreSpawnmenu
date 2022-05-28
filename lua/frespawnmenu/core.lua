@@ -74,12 +74,10 @@ local function openFreMenu()
 
 	local spawn_w = math.min( scrw - 10, scrw * 0.92 )
 
-	FreSpawnMenu = vgui.Create( 'DPanel' )
+	FreSpawnMenu = vgui.Create( 'EditablePanel' )
 	FreSpawnMenu:SetSize( spawn_w, math.min( scrh - 10, scrh * 0.95 )  )
 	FreSpawnMenu:Center()
 	FreSpawnMenu:MakePopup()
-	FreSpawnMenu:SetKeyboardInputEnabled( false )
-	FreSpawnMenu:SetMouseInputEnabled( true )
 	FreSpawnMenu:SetSkin( 'fsm' )
 	FreSpawnMenu.Paint = nil
 
