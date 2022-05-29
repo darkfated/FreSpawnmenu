@@ -316,20 +316,12 @@ local function openFreMenu()
 
 	// Setting standard settings when opening for the first time
 
-	for _, tool in ipairs( spawnmenu.GetTools() ) do
-		if ( _ == 1 ) then
-			tools_create( tool )
-		end
-	end
+	tools_create( spawnmenu.GetTools()[ 1 ] )
 
-	for k, v in SortedPairsByMemberValue( spawnmenu.GetCreationTabs(), 'Order' ) do
-		if ( k == GetConVar( 'frespawnmenu_content' ):GetString() ) then
-			local content = v.Function()
-			content:SetParent( action_panel_content )
-			content:Dock( FILL )
-			content:SetSkin( 'fsm' )
-		end
-	end
+	local content = spawnmenu.GetCreationTabs()[ GetConVar( 'frespawnmenu_content' ):GetString() ].Function()
+	content:SetParent( action_panel_content )
+	content:Dock( FILL )
+	content:SetSkin( 'fsm' )
 end
 
 hook.Add( 'OnSpawnMenuOpen', 'FreSpawnMenuOpen', function()
