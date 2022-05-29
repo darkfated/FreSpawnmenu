@@ -3,17 +3,6 @@ CreateClientConVar( 'frespawnmenu_content', '#spawnmenu.content_tab', true )
 CreateClientConVar( 'frespawnmenu_blur', 1, true )
 CreateClientConVar( 'frespawnmenu_tool_right', 1, true )
 
-local function DrawRect( x, y, w, h, t )
-	if ( not t ) then
-		t = 1
-	end
-
-	surface.DrawRect( x, y, w, t )
-	surface.DrawRect( x, y + h - t, w, t )
-	surface.DrawRect( x, y, t, h )
-	surface.DrawRect( x + w - t, y, t, h )
-end
-
 local Mat = Material( 'pp/blurscreen' )
 local color_white = Color(255,255,255)
 local color_gray = Color(70,70,70,200)
@@ -26,29 +15,30 @@ local scrw, scrh = ScrW(), ScrH()
 
 local function freBlur( panel, amount )
 	if ( GetConVar( 'frespawnmenu_blur' ):GetBool() ) then
-		local x, y = panel:LocalToScreen( 0, 0 )
+		return
+	end
 
-		surface.SetDrawColor( color_white )
-		surface.SetMaterial( Mat )
+	local x, y = panel:LocalToScreen( 0, 0 )
 
-		for i = 1, 3 do
-			Mat:SetFloat( '$blur', i * 0.3 * ( amount or 8 ) )
-			Mat:Recompute()
+	surface.SetDrawColor( color_white )
+	surface.SetMaterial( Mat )
 
-			render.UpdateScreenEffectTexture()
+	for i = 1, 3 do
+		Mat:SetFloat( '$blur', i * 0.3 * ( amount or 8 ) )
+		Mat:Recompute()
 
-			surface.DrawTexturedRect( x * -1, y * -1, scrw, scrh )
-		end
+		render.UpdateScreenEffectTexture()
+
+		surface.DrawTexturedRect( x * -1, y * -1, scrw, scrh )
 	end
 end
 
-local function freOutlinedBox( x, y, w, h, col, bordercol, thickness )
+local function freOutlinedBox( x, y, w, h, col, bordercol )
 	surface.SetDrawColor( col )
 	surface.DrawRect( x + 1, y + 1, w - 2, h - 2 )
 
 	surface.SetDrawColor( bordercol )
-
-	DrawRect( x, y, w, h, thickness )
+	surface.DrawOutlinedRect( x, y, w, h, 1 )
 end
 
 local function frePanel( self, w, h )
