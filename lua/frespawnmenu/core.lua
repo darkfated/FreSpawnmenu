@@ -169,30 +169,42 @@ local function openFreMenu()
 
 	surface.SetFont( 'Default' )
 
+	local function OpenContent( name, tab )
+		if ( GetConVar( 'frespawnmenu_content' ):GetString() == name ) then
+			return
+		end
+
+		soundPlay( 'buttons/lightswitch2.wav' )
+
+		action_panel_content:Clear()
+
+		local content = tab.Function()
+		content:SetParent( action_panel_content )
+		content:Dock( FILL )
+		content:SetSkin( 'fsm' )
+
+		RunConsoleCommand( 'frespawnmenu_content', name )
+	end
+
 	for name, v in SortedPairsByMemberValue( spawnmenu.GetCreationTabs(), 'Order' ) do
 		local btn_item = vgui.Create( 'DButton', tab_panel_sp )
 		btn_item:SetWide( surface.GetTextSize( name ) + 44 )
 		btn_item:SetText( name )
 
-		local function OpenContent()
-			if ( GetConVar( 'frespawnmenu_content' ):GetString() == name ) then
-				return
+		btn_item.DoClick = function()
+			OpenContent( name, v )
+		end
+		btn_item.DoRightClick = function()
+			local DM = DermaMenu()
+			DM:SetSkin( 'fsm' )
+
+			for name2, v2 in SortedPairsByMemberValue( spawnmenu.GetCreationTabs(), 'Order' ) do
+				DM:AddOption( name2, function()
+					OpenContent( name2, v2 )
+				end ):SetIcon( v2.Icon )
 			end
 
-			soundPlay( 'buttons/lightswitch2.wav' )
-
-			action_panel_content:Clear()
-
-			local content = v.Function()
-			content:SetParent( action_panel_content )
-			content:Dock( FILL )
-			content:SetSkin( 'fsm' )
-
-			RunConsoleCommand( 'frespawnmenu_content', name )
-		end
-
-		btn_item.DoClick = function( self, w, h )
-			OpenContent()
+			DM:Open()
 		end
 		btn_item.Paint = function( self, w, h )
 			freButton( self, w, h, name )
@@ -207,7 +219,7 @@ local function openFreMenu()
 			surface.DrawTexturedRect( 4, h * 0.5 - 8, w - 8, 16 )
 		end
 		icon_pan.DoClick = function()
-			OpenContent()
+			OpenContent( name, v )
 		end
 
 		tab_panel_sp:AddPanel( icon_pan )
