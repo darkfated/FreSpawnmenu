@@ -14,7 +14,7 @@ local color_icon_depressed = Color(230,230,230)
 local color_panel_tool_content = Color(255,255,255,145)
 local scrw, scrh = ScrW(), ScrH()
 
-local function freBlur( panel, amount )
+local function freBlur( panel )
 	if ( !GetConVar( 'frespawnmenu_blur' ):GetBool() or GetConVar( 'frespawnmenu_frame' ):GetBool() ) then
 		return
 	end
@@ -25,7 +25,7 @@ local function freBlur( panel, amount )
 	surface.SetMaterial( Mat )
 
 	for i = 1, 3 do
-		Mat:SetFloat( '$blur', i * 0.3 * ( amount or 8 ) )
+		Mat:SetFloat( '$blur', i * 2.4 )
 		Mat:Recompute()
 
 		render.UpdateScreenEffectTexture()
