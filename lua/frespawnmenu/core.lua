@@ -1,6 +1,7 @@
 CreateClientConVar( 'frespawnmenu', 1, true )
 CreateClientConVar( 'frespawnmenu_content', '#spawnmenu.content_tab', true )
 CreateClientConVar( 'frespawnmenu_blur', 1, true )
+CreateClientConVar( 'frespawnmenu_tool_right', 1, true )
 
 local function DrawRect( x, y, w, h, t )
 	if ( not t ) then
@@ -80,6 +81,7 @@ local function openFreMenu()
 	FreSpawnMenu:MakePopup()
 	FreSpawnMenu:SetSkin( 'fsm' )
 	FreSpawnMenu.Paint = nil
+	FreSpawnMenu.Hang = false
 
 	// Separation into Spawn and Tool part
 
@@ -96,11 +98,19 @@ local function openFreMenu()
 		frePanel( self, w, h )
 	end
 
-	global_div:SetLeft( MainPanel )
-	global_div:SetLeftWidth( spawn_w - 160 ) 
-	global_div:SetLeftMin( spawn_w * 0.8 )
-	global_div:SetRight( ToolPanel )
-	global_div:SetRightMin( 120 )
+	if ( GetConVar( 'frespawnmenu_tool_right' ):GetBool() ) then
+		global_div:SetLeft( MainPanel )
+		global_div:SetLeftWidth( spawn_w - 160 ) 
+		global_div:SetLeftMin( spawn_w * 0.8 )
+		global_div:SetRight( ToolPanel )
+		global_div:SetRightMin( 120 )
+	else
+		global_div:SetLeft( ToolPanel )
+		global_div:SetLeftWidth( 160 )
+		global_div:SetLeftMin( 120 )
+		global_div:SetRight( MainPanel )
+		global_div:SetRightMin( spawn_w * 0.8 )
+	end
 
 	// Splitting the Spawn part into a selection of tabs and an action bar
 
@@ -127,9 +137,15 @@ local function openFreMenu()
 	local action_panel_content = vgui.Create( 'DPanel', action_panel_div )
 	action_panel_content.Paint = nil
 
-	action_panel_div:SetLeft( action_panel_content )
-	action_panel_div:SetLeftWidth( spawn_div:GetWide() )
-	action_panel_div:SetRightMin( 0 )
+	if ( GetConVar( 'frespawnmenu_tool_right' ):GetBool() ) then
+		action_panel_div:SetLeft( action_panel_content )
+		action_panel_div:SetLeftWidth( spawn_div:GetWide() )
+		action_panel_div:SetRightMin( 0 )
+	else
+		action_panel_div:SetRight( action_panel_content )
+		action_panel_div:SetLeftWidth( 0 )
+		action_panel_div:SetLeftMin( 0 )
+	end
 
 	local tab_panel_sp = vgui.Create( 'DHorizontalScroller', tabs_panel )
 	tab_panel_sp:Dock( FILL )
@@ -219,7 +235,11 @@ local function openFreMenu()
 		draw.RoundedBox( 6, 0, 0, w, h, color_panel_tool_content )
 	end
 
-	action_panel_div:SetRight( tool_cp_sp )
+	if ( GetConVar( 'frespawnmenu_tool_right' ):GetBool() ) then
+		action_panel_div:SetRight( tool_cp_sp )
+	else
+		action_panel_div:SetLeft( tool_cp_sp )
+	end
 
 	local function tools_create( tool )
 		tool_sp:Clear()
@@ -253,7 +273,11 @@ local function openFreMenu()
 					tool_cp_sp:Clear()
 
 					if ( item.CPanelFunction != nil ) then
-						action_panel_div:SetRightMin( math.min( 300, spawn_w * 0.32 ) )
+						if ( GetConVar( 'frespawnmenu_tool_right' ):GetBool() ) then
+							action_panel_div:SetRightMin( math.min( 300, spawn_w * 0.32 ) )
+						else
+							action_panel_div:SetLeftMin( math.min( 300, spawn_w * 0.32 ) )
+						end
 	
 						local cp = vgui.Create( 'ControlPanel', tool_cp_sp )
 						cp:Dock( FILL )
@@ -372,6 +396,7 @@ hook.Add( 'PopulateToolMenu', 'FreSpawnMenuTool', function()
 	spawnmenu.AddToolMenuOption( 'Utilities', 'User', 'SpawnMenu', 'FreSpawnMenu', '', '', function( panel )
 		panel:AddControl( 'CheckBox', { Label = 'Menu activation status (enabled for operation or not)', Command = 'frespawnmenu' } )
 		panel:AddControl( 'CheckBox', { Label = 'Blur for background', Command = 'frespawnmenu_blur' } )
+		panel:AddControl( 'CheckBox', { Label = 'Tool part on the right (need rebuild)', Command = 'frespawnmenu_tool_right' } )
 		panel:AddControl( 'Button', { Label = 'Rebuild SpawnMenu', Command = 'frespawnmenu_rebuild' } )
 	end )
 end )
