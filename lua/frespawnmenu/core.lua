@@ -243,6 +243,19 @@ local function openFreMenu()
 		action_panel_div:SetLeft( tool_cp_sp )
 	end
 
+	local function create_tool( item )
+		local cp = vgui.Create( 'ControlPanel', tool_cp_sp )
+		cp:Dock( FILL )
+		cp:SetLabel( item.Text )
+
+		item.CPanelFunction( cp )
+
+		local PanSplit = vgui.Create( 'DPanel', cp )
+		PanSplit:SetTall( 6 )
+		PanSplit:Dock( TOP )
+		PanSplit.Paint = nil
+	end
+
 	local function tools_create( tool )
 		tool_sp:Clear()
 
@@ -275,17 +288,14 @@ local function openFreMenu()
 					tool_cp_sp:Clear()
 
 					if ( item.CPanelFunction != nil ) then
-						local cp = vgui.Create( 'ControlPanel', tool_cp_sp )
-						cp:Dock( FILL )
-						cp:SetLabel( item.Text )
-
-						item.CPanelFunction( cp )
-
-						local PanSplit = vgui.Create( 'DPanel', cp )
-						PanSplit:SetTall( 6 )
-						PanSplit:Dock( TOP )
-						PanSplit.Paint = nil
+						create_tool( item )
 					end
+				end
+
+				// Installing the active tool
+
+				if ( item.ItemName == GetConVarString( 'gmod_toolmode' ) ) then
+					create_tool( item )
 				end
 			end
 		end
