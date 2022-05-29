@@ -1,12 +1,36 @@
 local surface = surface
 local Color = Color
 
+local mat = Material( 'pp/blurscreen' )
+local color_white = Color(255,255,255)
+local scrw, scrh = ScrW(), ScrH()
+
+local function Blur( panel )
+	if ( !GetConVar( 'frespawnmenu_blur' ):GetBool() or GetConVar( 'frespawnmenu_frame' ):GetBool() ) then
+		return
+	end
+ 
+	local x, y = panel:LocalToScreen( 0, 0 )
+
+	surface.SetDrawColor( color_white )
+	surface.SetMaterial( mat )
+
+	for i = 1, 3 do
+		mat:SetFloat( '$blur', i * 2.4 )
+		mat:Recompute()
+
+		render.UpdateScreenEffectTexture()
+
+		surface.DrawTexturedRect( x * -1, y * -1, scrw, scrh )
+	end
+end
+
 SKIN = {}
 
 SKIN.PrintName = 'fsm'
 SKIN.Author = 'Freline'
 SKIN.DermaVersion = 1
-SKIN.GwenTexture = Material( 'gwenskin/frespawnmenu.png' )
+SKIN.GwenTexture = Material( 'gwenskin/frespawnmenu_skin.png' )
 
 SKIN.text_dark = Color( 0, 0, 0, 255 )
 SKIN.colTextEntryText = Color( 0, 0, 0, 255 )
@@ -19,7 +43,7 @@ SKIN.tex = {}
 SKIN.tex.Selection = GWEN.CreateTextureBorder( 384, 32, 31, 31, 4, 4, 4, 4 )
 
 SKIN.tex.Panels = {}
-SKIN.tex.Panels.Normal = GWEN.CreateTextureBorder( 256, 0, 63, 63, 16, 16, 16, 16 )
+SKIN.tex.Panels.Normal = GWEN.CreateTextureBorder( 256 + 64, 0, 63, 63, 16, 16, 16, 16 )
 SKIN.tex.Panels.Bright = GWEN.CreateTextureBorder( 256 + 64, 0, 63, 63, 16, 16, 16, 16 )
 SKIN.tex.Panels.Dark = GWEN.CreateTextureBorder( 256, 64, 63, 63, 16, 16, 16, 16 )
 SKIN.tex.Panels.Highlight = GWEN.CreateTextureBorder( 256 + 64, 64, 63, 63, 16, 16, 16, 16 )
@@ -252,6 +276,8 @@ SKIN.Colours.TooltipText = GWEN.TextureColor( 4 + 8 * 26, 500 )
 -----------------------------------------------------------]]
 function SKIN:PaintPanel( panel, w, h )
 	if ( !panel.m_bBackground ) then return end
+
+	Blur( panel )
 
 	self.tex.Panels.Normal( 0, 0, w, h, panel.m_bgColor )
 end

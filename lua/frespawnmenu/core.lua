@@ -4,7 +4,6 @@ CreateClientConVar( 'frespawnmenu_blur', 1, true )
 CreateClientConVar( 'frespawnmenu_tool_right', 1, true )
 CreateClientConVar( 'frespawnmenu_frame', 0, true )
 
-local Mat = Material( 'pp/blurscreen' )
 local color_white = Color(255,255,255)
 local color_gray = Color(70,70,70,200)
 local color_blue = Color(47,96,255)
@@ -14,37 +13,12 @@ local color_icon_depressed = Color(230,230,230)
 local color_panel_tool_content = Color(255,255,255,145)
 local scrw, scrh = ScrW(), ScrH()
 
-local function freBlur( panel )
-	if ( !GetConVar( 'frespawnmenu_blur' ):GetBool() or GetConVar( 'frespawnmenu_frame' ):GetBool() ) then
-		return
-	end
- 
-	local x, y = panel:LocalToScreen( 0, 0 )
-
-	surface.SetDrawColor( color_white )
-	surface.SetMaterial( Mat )
-
-	for i = 1, 3 do
-		Mat:SetFloat( '$blur', i * 2.4 )
-		Mat:Recompute()
-
-		render.UpdateScreenEffectTexture()
-
-		surface.DrawTexturedRect( x * -1, y * -1, scrw, scrh )
-	end
-end
-
 local function freOutlinedBox( x, y, w, h, col, bordercol )
 	surface.SetDrawColor( col )
 	surface.DrawRect( x + 1, y + 1, w - 2, h - 2 )
 
 	surface.SetDrawColor( bordercol )
 	surface.DrawOutlinedRect( x, y, w, h, 1 )
-end
-
-local function frePanel( self, w, h )
-	freBlur( self )
-	freOutlinedBox( 0, 0, w, h, color_panel, color_gray )
 end
 
 local function freButton( self, w, h, name )
@@ -97,9 +71,6 @@ local function openFreMenu()
 	MainPanel.Paint = nil
 
 	local ToolPanel = vgui.Create( 'DPanel', global_div )
-	ToolPanel.Paint = function( self, w, h )
-		frePanel( self, w, h )
-	end
 
 	if ( GetConVar( 'frespawnmenu_tool_right' ):GetBool() ) then
 		global_div:SetLeft( MainPanel )
@@ -123,14 +94,8 @@ local function openFreMenu()
 	spawn_div:SetDividerHeight( 4 )
 
 	local tabs_panel = vgui.Create( 'DPanel', spawn_div )
-	tabs_panel.Paint = function( self, w, h )
-		frePanel( self, w, h )
-	end
 
 	local action_panel = vgui.Create( 'DPanel', spawn_div )
-	action_panel.Paint = function( self, w, h )
-		frePanel( self, w, h )
-	end
 
 	local action_panel_div = vgui.Create( 'DHorizontalDivider', action_panel )
 	action_panel_div:Dock( FILL )
@@ -409,8 +374,11 @@ hook.Add( 'PopulateToolMenu', 'FreSpawnMenuTool', function()
 	spawnmenu.AddToolMenuOption( 'Utilities', 'User', 'SpawnMenu', 'FreSpawnMenu', '', '', function( panel )
 		panel:AddControl( 'CheckBox', { Label = 'Menu activation status (enabled for operation or not)', Command = 'frespawnmenu' } )
 		panel:AddControl( 'CheckBox', { Label = 'Blur for background', Command = 'frespawnmenu_blur' } )
-		panel:AddControl( 'CheckBox', { Label = 'Tool part on the right (need rebuild)', Command = 'frespawnmenu_tool_right' } )
-		panel:AddControl( 'CheckBox', { Label = 'Window mode (need rebuild)', Command = 'frespawnmenu_frame' } )
+
 		panel:AddControl( 'Button', { Label = 'Rebuild SpawnMenu', Command = 'frespawnmenu_rebuild' } )
+
+        panel:AddControl( 'Label', { Text = 'Requires a rebuild after changing the parameter:' } )
+		panel:AddControl( 'CheckBox', { Label = 'Tool part on the right', Command = 'frespawnmenu_tool_right' } )
+		panel:AddControl( 'CheckBox', { Label = 'Window mode', Command = 'frespawnmenu_frame' } )
 	end )
 end )
