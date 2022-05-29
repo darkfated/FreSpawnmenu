@@ -2,6 +2,7 @@ CreateClientConVar( 'frespawnmenu', 1, true )
 CreateClientConVar( 'frespawnmenu_content', '#spawnmenu.content_tab', true )
 CreateClientConVar( 'frespawnmenu_blur', 1, true )
 CreateClientConVar( 'frespawnmenu_tool_right', 1, true )
+CreateClientConVar( 'frespawnmenu_frame', 0, true )
 
 local Mat = Material( 'pp/blurscreen' )
 local color_white = Color(255,255,255)
@@ -14,10 +15,10 @@ local color_panel_tool_content = Color(255,255,255,145)
 local scrw, scrh = ScrW(), ScrH()
 
 local function freBlur( panel, amount )
-	if ( !GetConVar( 'frespawnmenu_blur' ):GetBool() ) then
+	if ( !GetConVar( 'frespawnmenu_blur' ):GetBool() or GetConVar( 'frespawnmenu_frame' ):GetBool() ) then
 		return
 	end
-
+ 
 	local x, y = panel:LocalToScreen( 0, 0 )
 
 	surface.SetDrawColor( color_white )
@@ -65,13 +66,25 @@ local function openFreMenu()
 
 	local spawn_w = math.min( scrw - 10, scrw * 0.92 )
 
-	FreSpawnMenu = vgui.Create( 'EditablePanel' )
+	if ( GetConVar( 'frespawnmenu_frame' ):GetBool() ) then
+		FreSpawnMenu = vgui.Create( 'DFrame' )
+		FreSpawnMenu:SetTitle( 'FreSpawnMenu' )
+		FreSpawnMenu:SetBackgroundBlur( true )
+		FreSpawnMenu:SetScreenLock( true )
+		FreSpawnMenu:SetSizable( true )
+		FreSpawnMenu.btnMaxim:SetDisabled( false )
+		FreSpawnMenu.btnMaxim.DoClick = function()
+			FreSpawnMenu:SetSize( scrw, scrh )
+			FreSpawnMenu:Center()
+		end
+	else
+		FreSpawnMenu = vgui.Create( 'EditablePanel' )
+	end
+
 	FreSpawnMenu:SetSize( spawn_w, math.min( scrh - 10, scrh * 0.95 )  )
 	FreSpawnMenu:Center()
 	FreSpawnMenu:MakePopup()
 	FreSpawnMenu:SetSkin( 'fsm' )
-	FreSpawnMenu.Paint = nil
-	FreSpawnMenu.Hang = false
 
 	// Separation into Spawn and Tool part
 
@@ -124,17 +137,27 @@ local function openFreMenu()
 	action_panel_div:DockMargin( 6, 6, 6, 6 )
 	action_panel_div:SetDividerWidth( 4 )
 
-	local action_panel_content = vgui.Create( 'DPanel', action_panel_div )
+	local action_panel_content_scroll = vgui.Create( 'DHorizontalScroller', action_panel_div )
+
+	local action_panel_content = vgui.Create( 'DPanel', action_panel_content_scroll )
 	action_panel_content.Paint = nil
 
+	action_panel_content_scroll:AddPanel( action_panel_content )
+	action_panel_content_scroll.Paint = function()
+		if ( GetConVar( 'frespawnmenu_tool_right' ):GetBool() and action_panel_div:GetLeftWidth() < 400 or action_panel_div:GetLeftWidth() > 400 ) then
+			action_panel_content:SetWide( 500 )
+		else
+			action_panel_content:SetWide( action_panel_div:GetLeftWidth() )
+		end
+	end
+
 	if ( GetConVar( 'frespawnmenu_tool_right' ):GetBool() ) then
-		action_panel_div:SetLeft( action_panel_content )
+		action_panel_div:SetLeft( action_panel_content_scroll )
 		action_panel_div:SetLeftWidth( spawn_div:GetWide() )
-		action_panel_div:SetRightMin( 0 )
+		action_panel_div:SetRightMin( math.min( 300, spawn_w * 0.32 ) )
 	else
-		action_panel_div:SetRight( action_panel_content )
-		action_panel_div:SetLeftWidth( 0 )
-		action_panel_div:SetLeftMin( 0 )
+		action_panel_div:SetRight( action_panel_content_scroll )
+		action_panel_div:SetLeftMin( math.min( 300, spawn_w * 0.32 ) )
 	end
 
 	local tab_panel_sp = vgui.Create( 'DHorizontalScroller', tabs_panel )
@@ -263,12 +286,6 @@ local function openFreMenu()
 					tool_cp_sp:Clear()
 
 					if ( item.CPanelFunction != nil ) then
-						if ( GetConVar( 'frespawnmenu_tool_right' ):GetBool() ) then
-							action_panel_div:SetRightMin( math.min( 300, spawn_w * 0.32 ) )
-						else
-							action_panel_div:SetLeftMin( math.min( 300, spawn_w * 0.32 ) )
-						end
-	
 						local cp = vgui.Create( 'ControlPanel', tool_cp_sp )
 						cp:Dock( FILL )
 						cp:SetLabel( item.Text )
@@ -379,6 +396,7 @@ hook.Add( 'PopulateToolMenu', 'FreSpawnMenuTool', function()
 		panel:AddControl( 'CheckBox', { Label = 'Menu activation status (enabled for operation or not)', Command = 'frespawnmenu' } )
 		panel:AddControl( 'CheckBox', { Label = 'Blur for background', Command = 'frespawnmenu_blur' } )
 		panel:AddControl( 'CheckBox', { Label = 'Tool part on the right (need rebuild)', Command = 'frespawnmenu_tool_right' } )
+		panel:AddControl( 'CheckBox', { Label = 'Window mode (need rebuild)', Command = 'frespawnmenu_frame' } )
 		panel:AddControl( 'Button', { Label = 'Rebuild SpawnMenu', Command = 'frespawnmenu_rebuild' } )
 	end )
 end )
