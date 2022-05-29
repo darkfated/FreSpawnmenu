@@ -14,7 +14,7 @@ local color_panel_tool_content = Color(255,255,255,145)
 local scrw, scrh = ScrW(), ScrH()
 
 local function freBlur( panel, amount )
-	if ( GetConVar( 'frespawnmenu_blur' ):GetBool() ) then
+	if ( !GetConVar( 'frespawnmenu_blur' ):GetBool() ) then
 		return
 	end
 
