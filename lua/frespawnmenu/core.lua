@@ -40,6 +40,10 @@ local function openFreMenu()
 
 	local spawn_w = math.min( scrw - 10, scrw * 0.92 )
 
+	local function spawnmenu_set_standart_size()
+		FreSpawnMenu:SetSize( spawn_w, math.min( scrh - 10, scrh * 0.95 )  )
+	end
+
 	if ( GetConVar( 'frespawnmenu_frame' ):GetBool() ) then
 		FreSpawnMenu = vgui.Create( 'DFrame' )
 		FreSpawnMenu:SetTitle( 'FreSpawnMenu' )
@@ -48,14 +52,20 @@ local function openFreMenu()
 		FreSpawnMenu:SetSizable( true )
 		FreSpawnMenu.btnMaxim:SetDisabled( false )
 		FreSpawnMenu.btnMaxim.DoClick = function()
-			FreSpawnMenu:SetSize( scrw, scrh )
+			if ( FreSpawnMenu:GetWide() == scrw ) then
+				spawnmenu_set_standart_size()
+			else
+				FreSpawnMenu:SetSize( scrw, scrh )
+			end
+
 			FreSpawnMenu:Center()
 		end
 	else
 		FreSpawnMenu = vgui.Create( 'EditablePanel' )
 	end
 
-	FreSpawnMenu:SetSize( spawn_w, math.min( scrh - 10, scrh * 0.95 )  )
+	spawnmenu_set_standart_size()
+
 	FreSpawnMenu:Center()
 	FreSpawnMenu:MakePopup()
 	FreSpawnMenu:SetSkin( 'fsm' )
