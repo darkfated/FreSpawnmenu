@@ -144,10 +144,12 @@ local function openFreMenu()
 
 	action_panel_content_scroll:AddPanel( action_panel_content )
 	action_panel_content_scroll.Paint = function()
-		if ( GetConVar( 'frespawnmenu_tool_right' ):GetBool() and action_panel_div:GetLeftWidth() < 400 or action_panel_div:GetLeftWidth() > 400 ) then
+		local convar_right = GetConVar( 'frespawnmenu_tool_right' ):GetBool()
+
+		if ( convar_right and action_panel_div:GetLeftWidth() < 400 or !convar_right and spawn_div:GetWide() - action_panel_div:GetLeftWidth() < 400 ) then
 			action_panel_content:SetWide( 500 )
 		else
-			action_panel_content:SetWide( action_panel_div:GetLeftWidth() )
+			action_panel_content:SetWide( convar_right and action_panel_div:GetLeftWidth() or spawn_div:GetWide() - action_panel_div:GetLeftWidth() )
 		end
 	end
 
