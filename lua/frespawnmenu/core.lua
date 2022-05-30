@@ -1,7 +1,9 @@
 CreateClientConVar( 'frespawnmenu', 1, true )
-CreateClientConVar( 'frespawnmenu_content', '#spawnmenu.content_tab', true )
+
+local frespawnmenu_content = CreateClientConVar( 'frespawnmenu_content', '#spawnmenu.content_tab', true )
+local frespawnmenu_tool_right = CreateClientConVar( 'frespawnmenu_tool_right', 1, true )
+
 CreateClientConVar( 'frespawnmenu_blur', 1, true )
-CreateClientConVar( 'frespawnmenu_tool_right', 1, true )
 CreateClientConVar( 'frespawnmenu_frame', 0, true )
 
 local color_white = Color(255,255,255)
@@ -22,7 +24,7 @@ local function freOutlinedBox( x, y, w, h, col, bordercol )
 end
 
 local function freButton( self, w, h, name )
-	draw.RoundedBox( 4, 0, 0, w, h, GetConVar( 'frespawnmenu_content' ):GetString() == name and color_blue or GetConVar( 'gmod_toolmode' ):GetString() == name and color_blue or color_gray )
+	draw.RoundedBox( 4, 0, 0, w, h, frespawnmenu_content:GetString() == name and color_blue or GetConVar( 'gmod_toolmode' ):GetString() == name and color_blue or color_gray )
 
 	local bor = self:IsHovered() and 2 or 1
 
@@ -82,7 +84,7 @@ local function openFreMenu()
 
 	local ToolPanel = vgui.Create( 'DPanel', global_div )
 
-	if ( GetConVar( 'frespawnmenu_tool_right' ):GetBool() ) then
+	if ( frespawnmenu_tool_right:GetBool() ) then
 		global_div:SetLeft( MainPanel )
 		global_div:SetLeftWidth( spawn_w - 160 ) 
 		global_div:SetLeftMin( spawn_w * 0.8 )
@@ -119,7 +121,7 @@ local function openFreMenu()
 
 	action_panel_content_scroll:AddPanel( action_panel_content )
 	action_panel_content_scroll.Paint = function()
-		local convar_right = GetConVar( 'frespawnmenu_tool_right' ):GetBool()
+		local convar_right = frespawnmenu_tool_right:GetBool()
 
 		if ( convar_right and action_panel_div:GetLeftWidth() < 400 or !convar_right and spawn_div:GetWide() - action_panel_div:GetLeftWidth() < 400 ) then
 			action_panel_content:SetWide( 500 )
@@ -128,7 +130,7 @@ local function openFreMenu()
 		end
 	end
 
-	if ( GetConVar( 'frespawnmenu_tool_right' ):GetBool() ) then
+	if ( frespawnmenu_tool_right:GetBool() ) then
 		action_panel_div:SetLeft( action_panel_content_scroll )
 		action_panel_div:SetLeftWidth( spawn_div:GetWide() )
 		action_panel_div:SetRightMin( math.min( 300, spawn_w * 0.32 ) )
@@ -145,7 +147,7 @@ local function openFreMenu()
 	surface.SetFont( 'Default' )
 
 	local function OpenContent( name, tab )
-		if ( GetConVar( 'frespawnmenu_content' ):GetString() == name ) then
+		if ( frespawnmenu_content:GetString() == name ) then
 			return
 		end
 
@@ -189,7 +191,7 @@ local function openFreMenu()
 		icon_pan:SetWide( 22 )
 		icon_pan:SetText( '' )
 		icon_pan.Paint = function( self, w, h )
-			surface.SetDrawColor( self.Depressed and GetConVar( 'frespawnmenu_content' ):GetString() != name and color_icon_depressed or color_white )
+			surface.SetDrawColor( self.Depressed and frespawnmenu_content:GetString() != name and color_icon_depressed or color_white )
 			surface.SetMaterial( Material( v.Icon ) )
 			surface.DrawTexturedRect( 4, h * 0.5 - 8, w - 8, 16 )
 		end
@@ -237,7 +239,7 @@ local function openFreMenu()
 		draw.RoundedBox( 6, 0, 0, w, h, color_panel_tool_content )
 	end
 
-	if ( GetConVar( 'frespawnmenu_tool_right' ):GetBool() ) then
+	if ( frespawnmenu_tool_right:GetBool() ) then
 		action_panel_div:SetRight( tool_cp_sp )
 	else
 		action_panel_div:SetLeft( tool_cp_sp )
@@ -324,7 +326,7 @@ local function openFreMenu()
 
 	tools_create( spawnmenu.GetTools()[ 1 ] )
 
-	local content = spawnmenu.GetCreationTabs()[ GetConVar( 'frespawnmenu_content' ):GetString() ].Function()
+	local content = spawnmenu.GetCreationTabs()[ frespawnmenu_content:GetString() ].Function()
 	content:SetParent( action_panel_content )
 	content:Dock( FILL )
 	content:SetSkin( 'fsm' )
