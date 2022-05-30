@@ -470,11 +470,13 @@ end
 --[[---------------------------------------------------------
 	Button
 -----------------------------------------------------------]]
+local color_text_window_btn_dis = Color(255,255,255,50)
+
 function SKIN:PaintWindowCloseButton( panel, w, h )
 	if ( !panel.m_bBackground ) then return end
 
 	if ( panel:GetDisabled() ) then
-		return self.tex.Window.Close( 0, 0, w, h, Color( 255, 255, 255, 50 ) )
+		return self.tex.Window.Close( 0, 0, w, h, color_text_window_btn_dis )
 	end
 
 	if ( panel.Depressed || panel:IsSelected() ) then
@@ -492,7 +494,7 @@ function SKIN:PaintWindowMinimizeButton( panel, w, h )
 	if ( !panel.m_bBackground ) then return end
 
 	if ( panel:GetDisabled() ) then
-		return self.tex.Window.Mini( 0, 0, w, h, Color( 255, 255, 255, 50 ) )
+		return self.tex.Window.Mini( 0, 0, w, h, color_text_window_btn_dis )
 	end
 
 	if ( panel.Depressed || panel:IsSelected() ) then
@@ -510,7 +512,7 @@ function SKIN:PaintWindowMaximizeButton( panel, w, h )
 	if ( !panel.m_bBackground ) then return end
 
 	if ( panel:GetDisabled() ) then
-		return self.tex.Window.Maxi( 0, 0, w, h, Color( 255, 255, 255, 50 ) )
+		return self.tex.Window.Maxi( 0, 0, w, h, color_text_window_btn_dis )
 	end
 
 	if ( panel.Depressed || panel:IsSelected() ) then
