@@ -168,6 +168,11 @@ local function openFreMenu()
 
 	action_panel_content_scroll:AddPanel( action_panel_content )
 	action_panel_content_scroll.Paint = function()
+		if ( !action_panel_div:GetDragging() ) then
+
+			return
+		end
+
 		local convar_right = frespawnmenu_tool_right:GetBool()
 
 		if ( convar_right and action_panel_div:GetLeftWidth() < 400 or !convar_right and spawn_div:GetWide() - action_panel_div:GetLeftWidth() < 400 ) then
