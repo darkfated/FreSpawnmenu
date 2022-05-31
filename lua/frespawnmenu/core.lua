@@ -62,6 +62,23 @@ local function openFreMenu()
 	FreSpawnMenu:Center()
 	FreSpawnMenu:MakePopup()
 	FreSpawnMenu:SetSkin( 'fsm' )
+	FreSpawnMenu:SetKeyboardInputEnabled( false )
+
+	function FreSpawnMenu:StartKeyFocus( pPanel )
+		self.m_pKeyFocus = pPanel
+
+		self:SetKeyboardInputEnabled( true )
+
+		self.m_bHangOpen = true
+	end
+	
+	function FreSpawnMenu:EndKeyFocus( pPanel )
+		if ( self.m_pKeyFocus != pPanel ) then
+			return
+		end
+
+		self:SetKeyboardInputEnabled( false )
+	end
 
 	// Separation into Spawn and Tool part
 
@@ -400,6 +417,8 @@ hook.Add( 'OnSpawnMenuOpen', 'FreSpawnMenuOpen', function()
 			FreSpawnMenu:SetVisible( true )
 		end
 
+		FreSpawnMenu.m_bHangOpen = false
+
 		hook.Call( 'SpawnMenuOpened', self )
 
 		return false
@@ -411,6 +430,13 @@ hook.Add( 'OnSpawnMenuClose', 'FreSpawnMenuClose', function()
 		RememberCursorPosition()
 
 		if ( IsValid( FreSpawnMenu ) ) then
+			if ( FreSpawnMenu.m_bHangOpen ) then
+
+				FreSpawnMenu.m_bHangOpen = false
+		
+				return
+			end
+
 			FreSpawnMenu:SetVisible( false )
 		end
 
@@ -423,6 +449,18 @@ hook.Add( 'OnSpawnMenuClose', 'FreSpawnMenuClose', function()
 		return false
 	elseif ( IsValid( FreSpawnMenu ) ) then
 		FreSpawnMenu:Remove()
+	end
+end )
+
+hook.Add( 'OnTextEntryGetFocus', 'FreSpawnMenuFocusOn', function( pnl )
+	if ( IsValid( FreSpawnMenu ) && IsValid( pnl ) && pnl:HasParent( FreSpawnMenu ) ) then
+		FreSpawnMenu:StartKeyFocus( pnl )
+	end
+end )
+
+hook.Add( 'OnTextEntryLoseFocus', 'FreSpawnMenuFocusOff', function( pnl )
+	if ( IsValid( FreSpawnMenu ) && IsValid( pnl ) && pnl:HasParent( FreSpawnMenu ) ) then
+		FreSpawnMenu:EndKeyFocus( pnl )
 	end
 end )
 
