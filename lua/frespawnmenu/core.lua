@@ -2,6 +2,7 @@ CreateClientConVar( 'frespawnmenu', 1, true )
 
 local frespawnmenu_content = CreateClientConVar( 'frespawnmenu_content', '#spawnmenu.content_tab', true )
 local frespawnmenu_tool_right = CreateClientConVar( 'frespawnmenu_tool_right', 1, true )
+local frespawnmenu_menubar = CreateClientConVar( 'frespawnmenu_menubar', 0, true )
 
 CreateClientConVar( 'frespawnmenu_blur', 1, true )
 CreateClientConVar( 'frespawnmenu_frame', 0, true )
@@ -71,6 +72,62 @@ local function openFreMenu()
 	local MainPanel = vgui.Create( 'DPanel', global_div )
 	MainPanel:SetWide( spawn_w )
 	MainPanel.Paint = nil
+
+	if ( frespawnmenu_menubar:GetBool() ) then
+		local panel_menubar = vgui.Create( 'DPanel', MainPanel )
+		panel_menubar:Dock( TOP )
+		panel_menubar:SetTall( 30 )
+		panel_menubar:DockMargin( 0, 0, 0, 4 )
+
+		local mb = vgui.Create( 'DMenuBar', panel_menubar )
+		mb:Dock( FILL )
+		mb.Paint = nil
+	
+		function mb:AddMenu( label )
+			local DM = DermaMenu()
+			DM:SetDeleteSelf( false )
+			DM:SetDrawColumn( true )
+			DM:Hide()
+			DM:SetSkin( 'fsm' )
+	
+			self.Menus[ label ] = DM
+		
+			local b = self:Add( 'DButton' )
+			b:SetText( label )
+			b:Dock( LEFT )
+			b:DockMargin( 5, 0, 0, 0 )
+			b:SetIsMenu( true )
+			b:SetPaintBackground( false )
+			b:SizeToContentsX( 16 )
+			b.DoClick = function()
+				if ( DM:IsVisible() ) then
+					DM:Hide()
+	
+					return
+				end
+	
+				local x, y = b:LocalToScreen( 0, 0 )
+	
+				DM:Open( x, y + b:GetTall(), false, b )
+			end
+	
+			b.OnCursorEntered = function()
+				local opened = self:GetOpenMenu()
+	
+				if ( !IsValid( opened ) or opened == DM ) then
+					return
+				end
+	
+				opened:Hide()
+				
+				b:DoClick()
+			end
+		
+			return DM
+		end
+	
+		hook.Run( 'PopulateMenuBar', mb )
+	end
 
 	local ToolPanel = vgui.Create( 'DPanel', global_div )
 
@@ -385,5 +442,6 @@ hook.Add( 'PopulateToolMenu', 'FreSpawnMenuTool', function()
         panel:AddControl( 'Label', { Text = 'Requires a rebuild after changing the parameter:' } )
 		panel:AddControl( 'CheckBox', { Label = 'Tool part on the right', Command = 'frespawnmenu_tool_right' } )
 		panel:AddControl( 'CheckBox', { Label = 'Window mode', Command = 'frespawnmenu_frame' } )
+		panel:AddControl( 'CheckBox', { Label = 'Context Menu Bar', Command = 'frespawnmenu_menubar' } )
 	end )
 end )
