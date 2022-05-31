@@ -8,8 +8,6 @@ CreateClientConVar( 'frespawnmenu_frame', 0, true )
 
 local color_white = Color(255,255,255)
 local color_gray = Color(70,70,70,200)
-local color_blue = Color(47,96,255)
-local color_button = Color(226,226,226)
 local color_panel = Color(202,202,202,200)
 local color_icon_depressed = Color(230,230,230)
 local color_panel_tool_content = Color(255,255,255,145)
@@ -21,14 +19,6 @@ local function freOutlinedBox( x, y, w, h, col, bordercol )
 
 	surface.SetDrawColor( bordercol )
 	surface.DrawOutlinedRect( x, y, w, h, 1 )
-end
-
-local function freButton( self, w, h, name )
-	draw.RoundedBox( 4, 0, 0, w, h, frespawnmenu_content:GetString() == name and color_blue or GetConVar( 'gmod_toolmode' ):GetString() == name and color_blue or color_gray )
-
-	local bor = self:IsHovered() and 2 or 1
-
-	draw.RoundedBox( 4, bor, bor, w - bor * 2, h - bor * 2, color_button )
 end
 
 local function soundPlay( snd )
@@ -183,9 +173,7 @@ local function openFreMenu()
 
 			DM:Open()
 		end
-		btn_item.Paint = function( self, w, h )
-			freButton( self, w, h, name )
-		end
+		btn_item.id = name
 
 		local icon_pan = vgui.Create( 'DButton', tab_panel_sp )
 		icon_pan:SetWide( 22 )
@@ -229,9 +217,6 @@ local function openFreMenu()
 	tool_CategoryButton:DockMargin( 4, 4, 4, -2 )
 	tool_CategoryButton:SetTall( 18 )
 	tool_CategoryButton:SetText( 'Categories' )
-	tool_CategoryButton.Paint = function( self, w, h )
-		freButton( self, w, h )
-	end
 
 	local tool_cp_sp = vgui.Create( 'DScrollPanel', action_panel_div )
 	tool_cp_sp:DockMargin( 6, 0, 0, 0 )
@@ -275,9 +260,7 @@ local function openFreMenu()
 				local cnt = item.Controls
 				local name = item.ItemName
 
-				tool_btn.Paint = function( self, w, h )
-					freButton( self, w, h, cnt )
-				end
+				tool_btn.id = cnt
 				tool_btn.DoClick = function()
 					if ( GetConVar( 'gmod_toolmode' ):GetString() == item.ItemName ) then
 						return

@@ -1,12 +1,14 @@
 local surface = surface
 local Color = Color
-
 local mat = Material( 'pp/blurscreen' )
 local color_white = Color(255,255,255)
+local color_gray = Color(70,70,70,200)
+local color_blue = Color(47,96,255)
+local color_button = Color(226,226,226)
 local scrw, scrh = ScrW(), ScrH()
 
 local function Blur( panel )
-	if ( !GetConVar( 'frespawnmenu_blur' ):GetBool() or GetConVar( 'frespawnmenu_frame' ):GetBool() ) then
+	if ( !GetConVar( 'frespawnmenu_blur' ):GetBool() or GetConVar( 'frespawnmenu_frame' ):GetBool() and IsValid( FreSpawnMenu.lblTitle ) ) then
 		return
 	end
  
@@ -25,12 +27,22 @@ local function Blur( panel )
 	end
 end
 
+local function ButtonPaint( self, w, h, name )
+	local frespawnmenu_content = GetConVar( 'frespawnmenu_content' )
+	
+	draw.RoundedBox( 4, 0, 0, w, h, frespawnmenu_content:GetString() == name and color_blue or frespawnmenu_content:GetString() == name and color_blue or color_gray )
+
+	local bor = self:IsHovered() and 2 or 1
+
+	draw.RoundedBox( 4, bor, bor, w - bor * 2, h - bor * 2, color_button )
+end
+
 SKIN = {}
 
-SKIN.PrintName = 'fsm'
+SKIN.PrintName = 'FreSpawnMenu Skin'
 SKIN.Author = 'Freline'
-SKIN.DermaVersion = 1
-SKIN.GwenTexture = Material( 'gwenskin/frespawnmenu_skin.png' )
+SKIN.DermaVersion = 1.1
+SKIN.GwenTexture = Material( 'gwenskin/frespawnmenu_skin_1_1.png' )
 
 SKIN.text_dark = Color( 0, 0, 0, 255 )
 SKIN.colTextEntryText = Color( 0, 0, 0, 255 )
@@ -41,18 +53,13 @@ SKIN.colTextEntryTextPlaceholder = Color( 109, 109, 109, 255 )
 SKIN.tex = {}
 
 SKIN.tex.Selection = GWEN.CreateTextureBorder( 384, 32, 31, 31, 4, 4, 4, 4 )
+SKIN.tex.Shadow = GWEN.CreateTextureBorder( 448, 0, 31, 31, 8, 8, 8, 8 )
 
 SKIN.tex.Panels = {}
 SKIN.tex.Panels.Normal = GWEN.CreateTextureBorder( 256 + 64, 0, 63, 63, 16, 16, 16, 16 )
 SKIN.tex.Panels.Bright = GWEN.CreateTextureBorder( 256 + 64, 0, 63, 63, 16, 16, 16, 16 )
 SKIN.tex.Panels.Dark = GWEN.CreateTextureBorder( 256, 64, 63, 63, 16, 16, 16, 16 )
 SKIN.tex.Panels.Highlight = GWEN.CreateTextureBorder( 256 + 64, 64, 63, 63, 16, 16, 16, 16 )
-
-SKIN.tex.Button = GWEN.CreateTextureBorder( 480, 0, 31, 31, 8, 8, 8, 8 )
-SKIN.tex.Button_Hovered = GWEN.CreateTextureBorder( 480, 32, 31, 31, 8, 8, 8, 8 )
-SKIN.tex.Button_Dead = GWEN.CreateTextureBorder( 480, 64, 31, 31, 8, 8, 8, 8 )
-SKIN.tex.Button_Down = GWEN.CreateTextureBorder( 480, 96, 31, 31, 8, 8, 8, 8 )
-SKIN.tex.Shadow = GWEN.CreateTextureBorder( 448, 0, 31, 31, 8, 8, 8, 8 )
 
 SKIN.tex.Tree = GWEN.CreateTextureBorder( 256, 128, 127, 127, 16, 16, 16, 16 )
 SKIN.tex.Checkbox_Checked = GWEN.CreateTextureNormal( 448, 32, 15, 15 )
@@ -311,19 +318,7 @@ end
 function SKIN:PaintButton( panel, w, h )
 	if ( !panel.m_bBackground ) then return end
 
-	if ( panel.Depressed || panel:IsSelected() || panel:GetToggle() ) then
-		return self.tex.Button_Down( 0, 0, w, h )
-	end
-
-	if ( panel:GetDisabled() ) then
-		return self.tex.Button_Dead( 0, 0, w, h )
-	end
-
-	if ( panel.Hovered ) then
-		return self.tex.Button_Hovered( 0, 0, w, h )
-	end
-
-	self.tex.Button( 0, 0, w, h )
+	ButtonPaint( panel, w, h, panel.id )
 end
 
 --[[---------------------------------------------------------
