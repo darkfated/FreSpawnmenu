@@ -90,62 +90,6 @@ local function openFreMenu()
 	MainPanel:SetWide( spawn_w )
 	MainPanel.Paint = nil
 
-	if ( frespawnmenu_menubar:GetBool() ) then
-		local panel_menubar = vgui.Create( 'DPanel', MainPanel )
-		panel_menubar:Dock( TOP )
-		panel_menubar:SetTall( 30 )
-		panel_menubar:DockMargin( 0, 0, 0, 4 )
-
-		local mb = vgui.Create( 'DMenuBar', panel_menubar )
-		mb:Dock( FILL )
-		mb.Paint = nil
-	
-		function mb:AddMenu( label )
-			local DM = DermaMenu()
-			DM:SetDeleteSelf( false )
-			DM:SetDrawColumn( true )
-			DM:Hide()
-			DM:SetSkin( 'fsm' )
-	
-			self.Menus[ label ] = DM
-		
-			local b = self:Add( 'DButton' )
-			b:SetText( label )
-			b:Dock( LEFT )
-			b:DockMargin( 5, 0, 0, 0 )
-			b:SetIsMenu( true )
-			b:SetPaintBackground( false )
-			b:SizeToContentsX( 16 )
-			b.DoClick = function()
-				if ( DM:IsVisible() ) then
-					DM:Hide()
-	
-					return
-				end
-	
-				local x, y = b:LocalToScreen( 0, 0 )
-	
-				DM:Open( x, y + b:GetTall(), false, b )
-			end
-	
-			b.OnCursorEntered = function()
-				local opened = self:GetOpenMenu()
-	
-				if ( !IsValid( opened ) or opened == DM ) then
-					return
-				end
-	
-				opened:Hide()
-				
-				b:DoClick()
-			end
-		
-			return DM
-		end
-	
-		hook.Run( 'PopulateMenuBar', mb )
-	end
-
 	local ToolPanel = vgui.Create( 'DPanel', global_div )
 
 	if ( frespawnmenu_tool_right:GetBool() ) then
@@ -278,6 +222,90 @@ local function openFreMenu()
 	end
 
 	tab_panel_sp:AddPanel( PanelEnd )
+
+	if ( frespawnmenu_menubar:GetBool() ) then
+		local panel_menubar = vgui.Create( 'DPanel', MainPanel )
+		panel_menubar:Dock( TOP )
+		panel_menubar:SetTall( 30 )
+		panel_menubar:DockMargin( 0, 0, 0, 4 )
+
+		local mb = vgui.Create( 'DMenuBar', panel_menubar )
+		mb:Dock( FILL )
+		mb.Paint = nil
+	
+		function mb:AddMenu( label )
+			local DM = DermaMenu()
+			DM:SetDeleteSelf( false )
+			DM:SetDrawColumn( true )
+			DM:Hide()
+			DM:SetSkin( 'fsm' )
+	
+			self.Menus[ label ] = DM
+		
+			local b = self:Add( 'DButton' )
+			b:SetText( label )
+			b:Dock( LEFT )
+			b:DockMargin( 5, 0, 0, 0 )
+			b:SetIsMenu( true )
+			b:SetPaintBackground( false )
+			b:SizeToContentsX( 16 )
+			b.DoClick = function()
+				if ( DM:IsVisible() ) then
+					DM:Hide()
+	
+					return
+				end
+	
+				local x, y = b:LocalToScreen( 0, 0 )
+	
+				DM:Open( x, y + b:GetTall(), false, b )
+			end
+	
+			b.OnCursorEntered = function()
+				local opened = self:GetOpenMenu()
+	
+				if ( !IsValid( opened ) or opened == DM ) then
+					return
+				end
+	
+				opened:Hide()
+				
+				b:DoClick()
+			end
+		
+			return DM
+		end
+	
+		hook.Run( 'PopulateMenuBar', mb )
+
+		local ContextMenu = mb:AddMenu( 'ContextMenu' )
+
+		for k, context_item in pairs( list.Get( 'DesktopWindows' ) ) do
+			ContextMenu:AddOption( context_item.title, function()
+				action_panel_content:Clear()
+
+				local ContextMenu_Window = vgui.Create( 'DPanel', action_panel_content )
+				ContextMenu_Window:SetSize( action_panel_content:GetSize() )
+				ContextMenu_Window:Dock( FILL )
+				ContextMenu_Window:SetSkin( 'fsm' )
+				ContextMenu_Window.Paint = nil
+
+				function ContextMenu_Window:SetTitle()
+				end
+
+				function ContextMenu_Window:SetSizable()
+				end
+
+				function ContextMenu_Window:SetMinWidth()
+				end
+
+				function ContextMenu_Window:SetMinHeight()
+				end
+
+				context_item.init( context_item.icon or nil, ContextMenu_Window )
+			end )
+		end
+	end
 
 	spawn_div:SetTop( tabs_panel )
 	spawn_div:SetTopMin( 34 )
