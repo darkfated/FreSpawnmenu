@@ -333,8 +333,7 @@ local function openFreMenu()
 	tool_CategoryButton:SetTall( 18 )
 	tool_CategoryButton:SetText( '#frespawnmenu.categories' )
 
-	local tool_cp_sp = vgui.Create( 'DScrollPanel', action_panel_div )
-	tool_cp_sp:DockMargin( 6, 0, 0, 0 )
+	local tool_cp_sp = vgui.Create( 'DCategoryList', action_panel_div )
 	tool_cp_sp.Paint = function( self, w, h )
 		draw.RoundedBox( 6, 0, 0, w, h, color_panel_tool_content )
 	end
