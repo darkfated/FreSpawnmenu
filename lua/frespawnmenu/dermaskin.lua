@@ -29,8 +29,9 @@ end
 
 local function ButtonPaint( self, w, h, name )
 	local frespawnmenu_content = GetConVar( 'frespawnmenu_content' )
+	local toolmode = GetConVar( 'gmod_toolmode' )
 	
-	draw.RoundedBox( 4, 0, 0, w, h, frespawnmenu_content:GetString() == name and color_blue or frespawnmenu_content:GetString() == name and color_blue or color_gray )
+	draw.RoundedBox( 4, 0, 0, w, h, ( frespawnmenu_content:GetString() == name or toolmode:GetString() == name ) and color_blue or color_gray )
 
 	local bor = self:IsHovered() and 2 or 1
 
