@@ -171,6 +171,19 @@ local function openFreMenu()
 		RunConsoleCommand( 'frespawnmenu_content', name )
 	end
 
+	local function OpenTabsDermaMenu()
+		local DM = DermaMenu()
+		DM:SetSkin( 'fsm' )
+
+		for name_tab, elem in SortedPairsByMemberValue( spawnmenu.GetCreationTabs(), 'Order' ) do
+			DM:AddOption( name_tab, function()
+				OpenContent( name_tab, elem )
+			end ):SetIcon( elem.Icon )
+		end
+
+		DM:Open()
+	end
+
 	for name, v in SortedPairsByMemberValue( spawnmenu.GetCreationTabs(), 'Order' ) do
 		local size_name = surface.GetTextSize( name )
 
@@ -182,16 +195,7 @@ local function openFreMenu()
 			OpenContent( name, v )
 		end
 		btn_item.DoRightClick = function()
-			local DM = DermaMenu()
-			DM:SetSkin( 'fsm' )
-
-			for name2, v2 in SortedPairsByMemberValue( spawnmenu.GetCreationTabs(), 'Order' ) do
-				DM:AddOption( name2, function()
-					OpenContent( name2, v2 )
-				end ):SetIcon( v2.Icon )
-			end
-
-			DM:Open()
+			OpenTabsDermaMenu()
 		end
 		btn_item.id = name
 
@@ -209,6 +213,9 @@ local function openFreMenu()
 		end
 		icon_pan.DoClick = function()
 			OpenContent( name, v )
+		end
+		icon_pan.DoRightClick = function()
+			OpenTabsDermaMenu()
 		end
 
 		tab_panel_sp:AddPanel( icon_pan )
