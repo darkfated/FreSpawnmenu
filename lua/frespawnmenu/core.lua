@@ -188,7 +188,7 @@ local function openFreMenu()
 		local size_name = surface.GetTextSize( name )
 
 		local btn_item = vgui.Create( 'DButton', tab_panel_sp )
-		btn_item:SetWide( size_name + 44 )
+		btn_item:SetWide( size_name + 10 + btn_item:GetTall() )
 		btn_item:SetText( name )
 
 		btn_item.DoClick = function()
