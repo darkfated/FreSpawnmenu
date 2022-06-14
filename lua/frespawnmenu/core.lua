@@ -3,6 +3,7 @@ CreateClientConVar( 'frespawnmenu', 1, true )
 local frespawnmenu_content = CreateClientConVar( 'frespawnmenu_content', '#spawnmenu.content_tab', true )
 local frespawnmenu_tool_right = CreateClientConVar( 'frespawnmenu_tool_right', 1, true )
 local frespawnmenu_menubar = CreateClientConVar( 'frespawnmenu_menubar', 0, true )
+local frespawnmenu_size = CreateClientConVar( 'frespawnmenu_size', 1, true )
 
 CreateClientConVar( 'frespawnmenu_blur', 1, true )
 CreateClientConVar( 'frespawnmenu_frame', 0, true )
@@ -31,10 +32,10 @@ local function openFreMenu()
 
 	achievements.SpawnMenuOpen()
 
-	local spawn_w = math.min( scrw - 10, scrw * 0.92 )
+	local spawn_w = math.min( scrw - 10, scrw * 0.92 ) * frespawnmenu_size:GetFloat()
 
 	local function spawnmenu_set_standart_size()
-		FreSpawnMenu:SetSize( spawn_w, math.min( scrh - 10, scrh * 0.95 )  )
+		FreSpawnMenu:SetSize( spawn_w, math.min( scrh - 10, scrh * 0.95 ) * frespawnmenu_size:GetFloat() )
 	end
 
 	if ( GetConVar( 'frespawnmenu_frame' ):GetBool() ) then
@@ -42,7 +43,6 @@ local function openFreMenu()
 		FreSpawnMenu:SetTitle( 'FreSpawnMenu' )
 		FreSpawnMenu:SetBackgroundBlur( true )
 		FreSpawnMenu:SetScreenLock( true )
-		FreSpawnMenu:SetSizable( true )
 		FreSpawnMenu.btnMaxim:SetDisabled( false )
 		FreSpawnMenu.btnMaxim.DoClick = function()
 			if ( FreSpawnMenu:GetWide() == scrw ) then
@@ -517,9 +517,10 @@ hook.Add( 'PopulateToolMenu', 'FreSpawnMenuTool', function()
 
 		panel:AddControl( 'Button', { Label = '#frespawnmenu.tool.rebuild', Command = 'frespawnmenu_rebuild' } )
 
-        panel:AddControl( 'Label', { Text = '#frespawnmenu.tool.rebuild_info' } )
+        panel:AddControl( 'Header', { Description = '#frespawnmenu.tool.rebuild_info' } )
 		panel:AddControl( 'CheckBox', { Label = '#frespawnmenu.tool.tool_right', Command = 'frespawnmenu_tool_right' } )
 		panel:AddControl( 'CheckBox', { Label = '#frespawnmenu.tool.window', Command = 'frespawnmenu_frame' } )
 		panel:AddControl( 'CheckBox', { Label = '#frespawnmenu.tool.menubar', Command = 'frespawnmenu_menubar' } )
+		panel:AddControl( 'Slider', { Label = '#frespawnmenu.tool.size', Command = 'frespawnmenu_size', Min = 0.5, Max = 1.05, Type = 'float' } )
 	end )
 end )
