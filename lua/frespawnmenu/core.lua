@@ -498,7 +498,7 @@ local function openFreMenu()
 end
 
 hook.Add( 'OnSpawnMenuOpen', 'FreSpawnMenuOpen', function()
-	if ( GetConVar( 'frespawnmenu' ):GetBool() ) then
+	if ( GetConVar( 'frespawnmenu' ):GetBool() and IsValid( g_SpawnMenu ) ) then
 		RestoreCursorPosition()
 
 		if ( not IsValid( FreSpawnMenu ) ) then
@@ -528,7 +528,7 @@ hook.Add( 'OnSpawnMenuOpen', 'FreSpawnMenuOpen', function()
 end )
 
 hook.Add( 'OnSpawnMenuClose', 'FreSpawnMenuClose', function()
-	if ( GetConVar( 'frespawnmenu' ):GetBool() ) then
+	if ( GetConVar( 'frespawnmenu' ):GetBool() and IsValid( g_SpawnMenu ) ) then
 		RememberCursorPosition()
 
 		if ( IsValid( FreSpawnMenu ) ) then
