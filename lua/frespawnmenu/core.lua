@@ -10,6 +10,7 @@ local frespawnmenu_scrollbar_tools = CreateClientConVar( 'frespawnmenu_scrollbar
 
 CreateClientConVar( 'frespawnmenu_blur', 1, true )
 CreateClientConVar( 'frespawnmenu_frame', 0, true )
+CreateClientConVar( 'frespawnmenu_adaptive_wide_nav', 0, true )
 
 local color_white = Color(255,255,255)
 local color_gray = Color(70,70,70,200)
@@ -117,6 +118,7 @@ local function openFreMenu()
 	spawn_div:SetDividerHeight( 4 )
 
 	local tabs_panel = vgui.Create( 'DPanel', spawn_div )
+	tabs_panel.user_wide = 0
 
 	local action_panel = vgui.Create( 'DPanel', spawn_div )
 
@@ -191,8 +193,13 @@ local function openFreMenu()
 		local size_name = surface.GetTextSize( name )
 
 		local btn_item = vgui.Create( 'DButton', tab_panel_sp )
-		btn_item:SetWide( size_name + 10 + btn_item:GetTall() )
+
+		local btn_item_wide = size_name + 10 + btn_item:GetTall()
+
+		btn_item:SetWide( btn_item_wide )
 		btn_item:SetText( name )
+
+		tabs_panel.user_wide = tabs_panel.user_wide + btn_item_wide + 4
 
 		btn_item.DoClick = function()
 			OpenContent( name, v )
@@ -205,6 +212,9 @@ local function openFreMenu()
 		if ( frespawnmenu_tab_icon:GetBool() ) then
 			local icon_pan = vgui.Create( 'DButton', tab_panel_sp )
 			icon_pan:SetWide( 22 )
+
+			tabs_panel.user_wide = tabs_panel.user_wide + 26
+
 			icon_pan:SetText( '' )
 			icon_pan.Paint = function( self, w, h )
 				surface.SetDrawColor( self.Depressed and frespawnmenu_content:GetString() != name and color_icon_depressed or color_white )
@@ -228,6 +238,8 @@ local function openFreMenu()
 		tab_panel_sp:AddPanel( btn_item )
 	end
 
+	tabs_panel.user_wide = tabs_panel.user_wide + 16
+
 	local PanelEnd = vgui.Create( 'DPanel', tab_panel_sp )
 	PanelEnd:SetWide( 4 )
 	PanelEnd.Paint = function( self, w, h )
@@ -241,11 +253,12 @@ local function openFreMenu()
 		panel_menubar:Dock( TOP )
 		panel_menubar:SetTall( 30 )
 		panel_menubar:DockMargin( 0, 0, 0, 4 )
+		panel_menubar.user_wide = 0
 
 		local mb = vgui.Create( 'DMenuBar', panel_menubar )
 		mb:Dock( FILL )
 		mb.Paint = nil
-	
+
 		function mb:AddMenu( label )
 			local DM = DermaMenu()
 			DM:SetDeleteSelf( false )
@@ -273,7 +286,6 @@ local function openFreMenu()
 	
 				DM:Open( x, y + b:GetTall(), false, b )
 			end
-	
 			b.OnCursorEntered = function()
 				local opened = self:GetOpenMenu()
 	
@@ -285,6 +297,8 @@ local function openFreMenu()
 				
 				b:DoClick()
 			end
+			
+			panel_menubar.user_wide = panel_menubar.user_wide + b:GetWide() + 5
 		
 			return DM
 		end
@@ -318,6 +332,8 @@ local function openFreMenu()
 				context_item.init( context_item.icon or nil, ContextMenu_Window )
 			end )
 		end
+
+		panel_menubar.user_wide = panel_menubar.user_wide + 5
 	end
 
 	spawn_div:SetTop( tabs_panel )
@@ -563,6 +579,7 @@ hook.Add( 'PopulateToolMenu', 'FreSpawnMenuTool', function()
 	spawnmenu.AddToolMenuOption( 'Utilities', 'User', 'SpawnMenu', 'FreSpawnMenu', '', '', function( panel )
 		panel:AddControl( 'CheckBox', { Label = '#frespawnmenu.tool.status', Command = 'frespawnmenu' } )
 		panel:AddControl( 'CheckBox', { Label = '#frespawnmenu.tool.blur', Command = 'frespawnmenu_blur' } )
+		panel:AddControl( 'CheckBox', { Label = '#frespawnmenu.tool.adaptive_wide_nav', Command = 'frespawnmenu_adaptive_wide_nav' } )
 
 		panel:AddControl( 'Button', { Label = '#frespawnmenu.tool.rebuild', Command = 'frespawnmenu_rebuild' } )
 

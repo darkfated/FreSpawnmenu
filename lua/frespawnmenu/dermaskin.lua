@@ -286,9 +286,13 @@ SKIN.Colours.TooltipText = GWEN.TextureColor( 4 + 8 * 26, 500 )
 function SKIN:PaintPanel( panel, w, h )
 	if ( !panel.m_bBackground ) then return end
 
-	Blur( panel )
+	local adaptive_wide = GetConVar( 'frespawnmenu_adaptive_wide_nav' ):GetBool()
 
-	self.tex.Panels.Normal( 0, 0, w, h, panel.m_bgColor )
+	if ( panel.user_wide == nil or !adaptive_wide or panel.user_wide != nil and h != 34 and h != 30 ) then
+		Blur( panel )
+	end
+
+	self.tex.Panels.Normal( 0, 0, adaptive_wide and ( h == 34 or h == 30 ) and panel.user_wide or w, h, panel.m_bgColor )
 end
 
 function SKIN:PaintShadow( panel, w, h )
