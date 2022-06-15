@@ -5,7 +5,7 @@ local color_white = Color(255,255,255)
 local color_gray = Color(70,70,70,200)
 local color_blue = Color(47,96,255)
 local color_button = Color(226,226,226)
-local color_orange = Color(255,145,0)
+local color_bluepurpl = Color(113,44,250)
 local scrw, scrh = ScrW(), ScrH()
 
 local function Blur( panel )
@@ -32,7 +32,7 @@ local function ButtonPaint( self, w, h, name, fav_bool )
 	local frespawnmenu_content = GetConVar( 'frespawnmenu_content' )
 	local toolmode = GetConVar( 'gmod_toolmode' )
 
-	draw.RoundedBox( 4, 0, 0, w, h, fav_bool and color_orange or ( ( frespawnmenu_content:GetString() == name or toolmode:GetString() == name ) and color_blue or color_gray ) )
+	draw.RoundedBox( 4, 0, 0, w, h, fav_bool and color_bluepurpl or ( ( frespawnmenu_content:GetString() == name or toolmode:GetString() == name ) and color_blue or color_gray ) )
 
 	local bor = ( self:IsHovered() or fav_bool ) and 2 or 1
 
