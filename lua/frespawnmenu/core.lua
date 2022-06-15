@@ -4,6 +4,9 @@ local frespawnmenu_content = CreateClientConVar( 'frespawnmenu_content', '#spawn
 local frespawnmenu_tool_right = CreateClientConVar( 'frespawnmenu_tool_right', 1, true )
 local frespawnmenu_menubar = CreateClientConVar( 'frespawnmenu_menubar', 0, true )
 local frespawnmenu_size = CreateClientConVar( 'frespawnmenu_size', 1, true )
+local frespawnmenu_tool = CreateClientConVar( 'frespawnmenu_tool', 1, true )
+local frespawnmenu_tool_category = CreateClientConVar( 'frespawnmenu_tool_category', 1, true )
+local frespawnmenu_tools_category = CreateClientConVar( 'frespawnmenu_tools_category', 1, true )
 
 CreateClientConVar( 'frespawnmenu_blur', 1, true )
 CreateClientConVar( 'frespawnmenu_frame', 0, true )
@@ -357,15 +360,17 @@ local function openFreMenu()
 		PanSplit.Paint = nil
 	end
 
-	local function tools_create( tool )
+	local function tools_create( tool, category_id )
 		tool_sp:Clear()
 
-		for _, category in ipairs( tool.Items ) do
+		RunConsoleCommand( 'frespawnmenu_tools_category', category_id )
+
+		for category_num, category in ipairs( tool.Items ) do
 			local CollapsibleTool = vgui.Create( 'DCollapsibleCategory', tool_sp )
 			CollapsibleTool:Dock( TOP )
 			CollapsibleTool:SetLabel( category.Text )
 
-			for _, item in ipairs( category ) do
+			for item_num, item in ipairs( category ) do
 				local tool_btn = vgui.Create( 'DButton', CollapsibleTool )
 				tool_btn:Dock( TOP )
 				-- tool_btn:DockMargin( 0, 4, 0, 0 )
@@ -384,17 +389,14 @@ local function openFreMenu()
 
 					spawnmenu.ActivateTool( name )
 
+					RunConsoleCommand( 'frespawnmenu_tool', item_num )
+					RunConsoleCommand( 'frespawnmenu_tool_category', category_num )
+
 					tool_cp_sp:Clear()
 
 					if ( item.CPanelFunction != nil ) then
 						create_tool( item )
 					end
-				end
-
-				// Installing the active tool
-
-				if ( item.ItemName == GetConVarString( 'gmod_toolmode' ) ) then
-					create_tool( item )
 				end
 			end
 		end
@@ -404,16 +406,14 @@ local function openFreMenu()
 		local DM = DermaMenu()
 		DM:SetSkin( 'fsm' )
 
-		for _, tool in ipairs( spawnmenu.GetTools() ) do
+		for category_id, tool in ipairs( spawnmenu.GetTools() ) do
 			local btn = DM:AddOption( tool.Label, function()
 				soundPlay()
 
-				tools_create( tool )
+				tools_create( tool, category_id )
 			end )
 			btn:SetIcon( tool.Icon )
 			btn.Paint = nil
-
-			-- DM:AddSpacer()
 		end
 
 		DM:Open()
@@ -421,7 +421,12 @@ local function openFreMenu()
 
 	// Setting standard settings when opening for the first time
 
-	tools_create( spawnmenu.GetTools()[ 1 ] )
+	local active_category = spawnmenu.GetTools()[ frespawnmenu_tools_category:GetInt() ] or spawnmenu.GetTools()[ 1 ]
+	local active_tool_category = active_category.Items[ frespawnmenu_tool_category:GetInt() ] or active_category.Items[ 1 ]
+	local active_tool = active_tool_category[ frespawnmenu_tool:GetInt() ] or active_tool_category[ 1 ]
+
+	tools_create( active_category )
+	create_tool( active_tool )
 
 	local content = spawnmenu.GetCreationTabs()[ frespawnmenu_content:GetString() ].Function()
 	content:SetParent( action_panel_content )
