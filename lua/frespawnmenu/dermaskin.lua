@@ -5,6 +5,7 @@ local color_white = Color(255,255,255)
 local color_gray = Color(70,70,70,200)
 local color_blue = Color(47,96,255)
 local color_button = Color(226,226,226)
+local color_orange = Color(255,145,0)
 local scrw, scrh = ScrW(), ScrH()
 
 local function Blur( panel )
@@ -27,13 +28,13 @@ local function Blur( panel )
 	end
 end
 
-local function ButtonPaint( self, w, h, name )
+local function ButtonPaint( self, w, h, name, fav_bool )
 	local frespawnmenu_content = GetConVar( 'frespawnmenu_content' )
 	local toolmode = GetConVar( 'gmod_toolmode' )
-	
-	draw.RoundedBox( 4, 0, 0, w, h, ( frespawnmenu_content:GetString() == name or toolmode:GetString() == name ) and color_blue or color_gray )
 
-	local bor = self:IsHovered() and 2 or 1
+	draw.RoundedBox( 4, 0, 0, w, h, fav_bool and color_orange or ( ( frespawnmenu_content:GetString() == name or toolmode:GetString() == name ) and color_blue or color_gray ) )
+
+	local bor = ( self:IsHovered() or fav_bool ) and 2 or 1
 
 	draw.RoundedBox( 4, bor, bor, w - bor * 2, h - bor * 2, color_button )
 end
@@ -319,7 +320,7 @@ end
 function SKIN:PaintButton( panel, w, h )
 	if ( !panel.m_bBackground ) then return end
 
-	ButtonPaint( panel, w, h, panel.id )
+	ButtonPaint( panel, w, h, panel.id, panel.fav )
 end
 
 --[[---------------------------------------------------------

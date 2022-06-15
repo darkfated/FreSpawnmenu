@@ -359,6 +359,8 @@ local function openFreMenu()
 	end
 
 	local function tools_create( tool, category_id )
+		local favorites_tool = util.JSONToTable( file.Read( 'frespawnmenu_fav_tools.json', 'DATA' ) or '[]' )
+
 		tool_sp:Clear()
 
 		for category_num, category in ipairs( tool.Items ) do
@@ -375,8 +377,13 @@ local function openFreMenu()
 				local name = item.ItemName
 
 				tool_btn.id = cnt
+
+				if ( table.HasValue( favorites_tool, name ) ) then -- Preset favorite tool
+					tool_btn.fav = true
+				end
+
 				tool_btn.DoClick = function()
-					if ( GetConVar( 'gmod_toolmode' ):GetString() == item.ItemName ) then
+					if ( GetConVar( 'gmod_toolmode' ):GetString() == name ) then
 						return
 					end
 
@@ -391,6 +398,40 @@ local function openFreMenu()
 					if ( item.CPanelFunction != nil ) then
 						create_tool( item )
 					end
+				end
+				tool_btn.DoRightClick = function()
+					soundPlay()
+
+					local DM = DermaMenu()
+					DM:SetSkin( 'fsm' )
+					
+					if ( not tool_btn.fav ) then
+						local fav = DM:AddOption( 'Add to Favorites', function()
+							soundPlay( 'garrysmod/content_downloaded.wav' )
+
+							table.insert( favorites_tool, item.ItemName )
+
+							file.Write( 'frespawnmenu_fav_tools.json', util.TableToJSON( favorites_tool ) )
+
+							tool_btn.fav = true
+						end )
+						fav.Paint = nil
+						fav:SetIcon( 'icon16/star.png' )
+					else
+						local remove_fav = DM:AddOption( 'Remove from Favorites', function()
+							soundPlay( 'garrysmod/content_downloaded.wav' )
+
+							table.RemoveByValue( favorites_tool, item.ItemName )
+
+							file.Write( 'frespawnmenu_fav_tools.json', util.TableToJSON( favorites_tool ) )
+
+							tool_btn.fav = false
+						end )
+						remove_fav.Paint = nil
+						remove_fav:SetIcon( 'icon16/cross.png' )	
+					end
+
+					DM:Open()
 				end
 			end
 		end
