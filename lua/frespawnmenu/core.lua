@@ -10,7 +10,7 @@ local frespawnmenu_scrollbar_tools = CreateClientConVar( 'frespawnmenu_scrollbar
 
 CreateClientConVar( 'frespawnmenu_blur', 1, true )
 CreateClientConVar( 'frespawnmenu_frame', 0, true )
-CreateClientConVar( 'frespawnmenu_adaptive_wide_nav', 0, true )
+CreateClientConVar( 'frespawnmenu_adaptive_wide_nav', 1, true )
 
 local color_white = Color(255,255,255)
 local color_gray = Color(70,70,70,200)
