@@ -37,6 +37,7 @@ local function openFreMenu()
 	achievements.SpawnMenuOpen()
 
 	local spawn_w = math.min( scrw - 10, scrw * 0.92 ) * frespawnmenu_size:GetFloat()
+	local spawnmenu_tabs = spawnmenu.GetCreationTabs()
 
 	local function spawnmenu_set_standart_size()
 		FreSpawnMenu:SetSize( spawn_w, math.min( scrh - 10, scrh * 0.95 ) * frespawnmenu_size:GetFloat() )
@@ -180,16 +181,18 @@ local function openFreMenu()
 		local DM = DermaMenu()
 		DM:SetSkin( 'fsm' )
 
-		for name_tab, elem in SortedPairsByMemberValue( spawnmenu.GetCreationTabs(), 'Order' ) do
-			DM:AddOption( name_tab, function()
-				OpenContent( name_tab, elem )
-			end ):SetIcon( elem.Icon )
+		for name_tab, elem in SortedPairsByMemberValue( spawnmenu_tabs, 'Order' ) do
+			if ( name_tab != frespawnmenu_content:GetString() ) then
+				DM:AddOption( name_tab, function()
+					OpenContent( name_tab, elem )
+				end ):SetIcon( elem.Icon )
+			end
 		end
 
 		DM:Open()
 	end
 
-	for name, v in SortedPairsByMemberValue( spawnmenu.GetCreationTabs(), 'Order' ) do
+	for name, v in SortedPairsByMemberValue( spawnmenu_tabs, 'Order' ) do
 		local size_name = surface.GetTextSize( name )
 
 		local btn_item = vgui.Create( 'DButton', tab_panel_sp )
@@ -488,7 +491,7 @@ local function openFreMenu()
 	tools_create( active_category, save_tool_data[ 1 ] )
 	create_tool( active_tool )
 
-	local content = spawnmenu.GetCreationTabs()[ frespawnmenu_content:GetString() ].Function()
+	local content = spawnmenu_tabs[ frespawnmenu_content:GetString() ].Function()
 	content:SetParent( action_panel_content )
 	content:Dock( FILL )
 	content:SetSkin( 'fsm' )
