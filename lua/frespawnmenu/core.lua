@@ -5,6 +5,7 @@ local frespawnmenu_tool_right = CreateClientConVar( 'frespawnmenu_tool_right', 1
 local frespawnmenu_menubar = CreateClientConVar( 'frespawnmenu_menubar', 0, true )
 local frespawnmenu_size = CreateClientConVar( 'frespawnmenu_size', 1, true )
 local frespawnmenu_save_tool = CreateClientConVar( 'frespawnmenu_save_tool', '[1.0,1.0,1.0]', true )
+local frespawnmenu_tab_icon = CreateClientConVar( 'frespawnmenu_tab_icon', 1, true )
 
 CreateClientConVar( 'frespawnmenu_blur', 1, true )
 CreateClientConVar( 'frespawnmenu_frame', 0, true )
@@ -200,26 +201,29 @@ local function openFreMenu()
 		end
 		btn_item.id = name
 
-		local icon_pan = vgui.Create( 'DButton', tab_panel_sp )
-		icon_pan:SetWide( 22 )
-		icon_pan:SetText( '' )
-		icon_pan.Paint = function( self, w, h )
-			surface.SetDrawColor( self.Depressed and frespawnmenu_content:GetString() != name and color_icon_depressed or color_white )
-			surface.SetMaterial( Material( v.Icon ) )
-			surface.DrawTexturedRect( 4, h * 0.5 - 8, w - 8, 16 )
+		if ( frespawnmenu_tab_icon:GetBool() ) then
+			local icon_pan = vgui.Create( 'DButton', tab_panel_sp )
+			icon_pan:SetWide( 22 )
+			icon_pan:SetText( '' )
+			icon_pan.Paint = function( self, w, h )
+				surface.SetDrawColor( self.Depressed and frespawnmenu_content:GetString() != name and color_icon_depressed or color_white )
+				surface.SetMaterial( Material( v.Icon ) )
+				surface.DrawTexturedRect( 4, h * 0.5 - 8, w - 8, 16 )
 
-			if ( spawn_div:GetDragging() ) then
-				btn_item:SetWide( size_name + 10 + btn_item:GetTall() )
+				if ( spawn_div:GetDragging() ) then
+					btn_item:SetWide( size_name + 10 + btn_item:GetTall() )
+				end
 			end
-		end
-		icon_pan.DoClick = function()
-			OpenContent( name, v )
-		end
-		icon_pan.DoRightClick = function()
-			OpenTabsDermaMenu()
+			icon_pan.DoClick = function()
+				OpenContent( name, v )
+			end
+			icon_pan.DoRightClick = function()
+				OpenTabsDermaMenu()
+			end
+
+			tab_panel_sp:AddPanel( icon_pan )
 		end
 
-		tab_panel_sp:AddPanel( icon_pan )
 		tab_panel_sp:AddPanel( btn_item )
 	end
 
@@ -563,5 +567,6 @@ hook.Add( 'PopulateToolMenu', 'FreSpawnMenuTool', function()
 		panel:AddControl( 'CheckBox', { Label = '#frespawnmenu.tool.window', Command = 'frespawnmenu_frame' } )
 		panel:AddControl( 'CheckBox', { Label = '#frespawnmenu.tool.menubar', Command = 'frespawnmenu_menubar' } )
 		panel:AddControl( 'Slider', { Label = '#frespawnmenu.tool.size', Command = 'frespawnmenu_size', Min = 0.5, Max = 1.05, Type = 'float' } )
+		panel:AddControl( 'CheckBox', { Label = '#frespawnmenu.tool.tab_icon', Command = 'frespawnmenu_tab_icon' } )
 	end )
 end )
