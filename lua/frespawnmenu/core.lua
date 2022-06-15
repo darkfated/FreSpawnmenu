@@ -4,9 +4,7 @@ local frespawnmenu_content = CreateClientConVar( 'frespawnmenu_content', '#spawn
 local frespawnmenu_tool_right = CreateClientConVar( 'frespawnmenu_tool_right', 1, true )
 local frespawnmenu_menubar = CreateClientConVar( 'frespawnmenu_menubar', 0, true )
 local frespawnmenu_size = CreateClientConVar( 'frespawnmenu_size', 1, true )
-local frespawnmenu_tool = CreateClientConVar( 'frespawnmenu_tool', 1, true )
-local frespawnmenu_tool_category = CreateClientConVar( 'frespawnmenu_tool_category', 1, true )
-local frespawnmenu_tools_category = CreateClientConVar( 'frespawnmenu_tools_category', 1, true )
+local frespawnmenu_save_tool = CreateClientConVar( 'frespawnmenu_save_tool', '[1.0,1.0,1.0]', true )
 
 CreateClientConVar( 'frespawnmenu_blur', 1, true )
 CreateClientConVar( 'frespawnmenu_frame', 0, true )
@@ -363,8 +361,6 @@ local function openFreMenu()
 	local function tools_create( tool, category_id )
 		tool_sp:Clear()
 
-		RunConsoleCommand( 'frespawnmenu_tools_category', category_id )
-
 		for category_num, category in ipairs( tool.Items ) do
 			local CollapsibleTool = vgui.Create( 'DCollapsibleCategory', tool_sp )
 			CollapsibleTool:Dock( TOP )
@@ -373,7 +369,6 @@ local function openFreMenu()
 			for item_num, item in ipairs( category ) do
 				local tool_btn = vgui.Create( 'DButton', CollapsibleTool )
 				tool_btn:Dock( TOP )
-				-- tool_btn:DockMargin( 0, 4, 0, 0 )
 				tool_btn:SetText( item.Text )
 
 				local cnt = item.Controls
@@ -389,8 +384,7 @@ local function openFreMenu()
 
 					spawnmenu.ActivateTool( name )
 
-					RunConsoleCommand( 'frespawnmenu_tool', item_num )
-					RunConsoleCommand( 'frespawnmenu_tool_category', category_num )
+					RunConsoleCommand( 'frespawnmenu_save_tool', util.TableToJSON( { category_id, category_num, item_num } ) )
 
 					tool_cp_sp:Clear()
 
@@ -421,11 +415,12 @@ local function openFreMenu()
 
 	// Setting standard settings when opening for the first time
 
-	local active_category = spawnmenu.GetTools()[ frespawnmenu_tools_category:GetInt() ] or spawnmenu.GetTools()[ 1 ]
-	local active_tool_category = active_category.Items[ frespawnmenu_tool_category:GetInt() ] or active_category.Items[ 1 ]
-	local active_tool = active_tool_category[ frespawnmenu_tool:GetInt() ] or active_tool_category[ 1 ]
+	local save_tool_data = util.JSONToTable( frespawnmenu_save_tool:GetString() )
+	local active_category = spawnmenu.GetTools()[ save_tool_data[ 1 ] ] or spawnmenu.GetTools()[ 1 ]
+	local active_tool_category = active_category.Items[ save_tool_data[ 2 ] ] or active_category.Items[ 1 ]
+	local active_tool = active_tool_category[ save_tool_data[ 3 ] ] or active_tool_category[ 1 ]
 
-	tools_create( active_category )
+	tools_create( active_category, save_tool_data[ 1 ] )
 	create_tool( active_tool )
 
 	local content = spawnmenu.GetCreationTabs()[ frespawnmenu_content:GetString() ].Function()
