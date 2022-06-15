@@ -406,7 +406,7 @@ local function openFreMenu()
 					DM:SetSkin( 'fsm' )
 					
 					if ( not tool_btn.fav ) then
-						local fav = DM:AddOption( 'Add to Favorites', function()
+						local fav = DM:AddOption( '#frespawnmenu.fav_add', function()
 							soundPlay( 'garrysmod/content_downloaded.wav' )
 
 							table.insert( favorites_tool, item.ItemName )
@@ -418,7 +418,7 @@ local function openFreMenu()
 						fav.Paint = nil
 						fav:SetIcon( 'icon16/star.png' )
 					else
-						local remove_fav = DM:AddOption( 'Remove from Favorites', function()
+						local remove_fav = DM:AddOption( '#frespawnmenu.fav_remove', function()
 							soundPlay( 'garrysmod/content_downloaded.wav' )
 
 							table.RemoveByValue( favorites_tool, item.ItemName )
