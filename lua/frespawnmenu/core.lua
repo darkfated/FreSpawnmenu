@@ -6,6 +6,7 @@ local frespawnmenu_menubar = CreateClientConVar( 'frespawnmenu_menubar', 0, true
 local frespawnmenu_size = CreateClientConVar( 'frespawnmenu_size', 1, true )
 local frespawnmenu_save_tool = CreateClientConVar( 'frespawnmenu_save_tool', '[1.0,1.0,1.0]', true )
 local frespawnmenu_tab_icon = CreateClientConVar( 'frespawnmenu_tab_icon', 1, true )
+local frespawnmenu_scrollbar_tools = CreateClientConVar( 'frespawnmenu_scrollbar_tools', 0, true )
 
 CreateClientConVar( 'frespawnmenu_blur', 1, true )
 CreateClientConVar( 'frespawnmenu_frame', 0, true )
@@ -330,7 +331,10 @@ local function openFreMenu()
 	local tool_sp = vgui.Create( 'DScrollPanel', ToolPanel )
 	tool_sp:Dock( FILL )
 	tool_sp:DockMargin( 6, 6, 6, 6 )
-	tool_sp:GetVBar():SetWide( 0 )
+
+	if ( !frespawnmenu_scrollbar_tools:GetBool() ) then
+		tool_sp:GetVBar():SetWide( 0 )
+	end
 
 	local tool_CategoryButton = vgui.Create( 'DButton', ToolPanel )
 	tool_CategoryButton:Dock( TOP )
@@ -568,5 +572,6 @@ hook.Add( 'PopulateToolMenu', 'FreSpawnMenuTool', function()
 		panel:AddControl( 'CheckBox', { Label = '#frespawnmenu.tool.menubar', Command = 'frespawnmenu_menubar' } )
 		panel:AddControl( 'Slider', { Label = '#frespawnmenu.tool.size', Command = 'frespawnmenu_size', Min = 0.5, Max = 1.05, Type = 'float' } )
 		panel:AddControl( 'CheckBox', { Label = '#frespawnmenu.tool.tab_icon', Command = 'frespawnmenu_tab_icon' } )
+		panel:AddControl( 'CheckBox', { Label = '#frespawnmenu.tool.scrollbar_tools', Command = 'frespawnmenu_scrollbar_tools' } )
 	end )
 end )
