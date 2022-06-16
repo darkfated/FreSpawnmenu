@@ -7,6 +7,7 @@ local frespawnmenu_size = CreateClientConVar( 'frespawnmenu_size', 1, true )
 local frespawnmenu_save_tool = CreateClientConVar( 'frespawnmenu_save_tool', '[1.0,1.0,1.0]', true )
 local frespawnmenu_tab_icon = CreateClientConVar( 'frespawnmenu_tab_icon', 1, true )
 local frespawnmenu_scrollbar_tools = CreateClientConVar( 'frespawnmenu_scrollbar_tools', 0, true )
+local frespawnmenu_custom_sound = CreateClientConVar( 'frespawnmenu_custom_sound', 1, true )
 
 CreateClientConVar( 'frespawnmenu_blur', 1, true )
 CreateClientConVar( 'frespawnmenu_frame', 0, true )
@@ -28,7 +29,7 @@ local function freOutlinedBox( x, y, w, h, col, bordercol )
 end
 
 local function soundPlay( snd )
-	surface.PlaySound( snd == nil and 'UI/buttonclickrelease.wav' or snd )
+	surface.PlaySound( !snd and 'UI/buttonclickrelease.wav' or snd )
 end
 
 local function openFreMenu()
@@ -50,6 +51,8 @@ local function openFreMenu()
 		FreSpawnMenu:SetScreenLock( true )
 		FreSpawnMenu.btnMaxim:SetDisabled( false )
 		FreSpawnMenu.btnMaxim.DoClick = function()
+			soundPlay( frespawnmenu_custom_sound:GetBool() and 'frespawnmenu/frame_full.ogg' )
+
 			if ( FreSpawnMenu:GetWide() == scrw ) then
 				spawnmenu_set_standart_size()
 			else
@@ -57,6 +60,11 @@ local function openFreMenu()
 			end
 
 			FreSpawnMenu:Center()
+		end
+		FreSpawnMenu.btnClose.DoClick = function()
+			soundPlay( frespawnmenu_custom_sound:GetBool() and 'frespawnmenu/frame_close.ogg' )
+
+			FreSpawnMenu:Remove()
 		end
 	else
 		FreSpawnMenu = vgui.Create( 'EditablePanel' )
@@ -570,6 +578,10 @@ end )
 
 concommand.Add( 'frespawnmenu_rebuild', function()
 	if ( IsValid( FreSpawnMenu ) ) then
+		if ( FreSpawnMenu:IsVisible() ) then
+			soundPlay( frespawnmenu_custom_sound:GetBool() and 'frespawnmenu/frame_close.ogg' )
+		end
+
 		FreSpawnMenu:Remove()
 
 		FreSpawnMenu = nil
@@ -583,6 +595,7 @@ hook.Add( 'PopulateToolMenu', 'FreSpawnMenuTool', function()
 		panel:AddControl( 'CheckBox', { Label = '#frespawnmenu.tool.status', Command = 'frespawnmenu' } )
 		panel:AddControl( 'CheckBox', { Label = '#frespawnmenu.tool.blur', Command = 'frespawnmenu_blur' } )
 		panel:AddControl( 'CheckBox', { Label = '#frespawnmenu.tool.adaptive_wide_nav', Command = 'frespawnmenu_adaptive_wide_nav' } )
+		panel:AddControl( 'CheckBox', { Label = '#frespawnmenu.tool.custom_sound', Command = 'frespawnmenu_custom_sound' } )
 
 		panel:AddControl( 'Button', { Label = '#frespawnmenu.tool.rebuild', Command = 'frespawnmenu_rebuild' } )
 
