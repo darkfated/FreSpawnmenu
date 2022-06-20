@@ -40,6 +40,7 @@ local function openFreMenu()
 
 	local spawn_w = math.min( scrw - 10, scrw * 0.92 ) * frespawnmenu_size:GetFloat()
 	local spawnmenu_tabs = spawnmenu.GetCreationTabs()
+	local spawnmenu_tools = spawnmenu.GetTools()
 
 	local function spawnmenu_set_standart_size()
 		FreSpawnMenu:SetSize( spawn_w, math.min( scrh - 10, scrh * 0.95 ) * frespawnmenu_size:GetFloat() )
@@ -428,6 +429,73 @@ local function openFreMenu()
 		PanSplit.Paint = nil
 	end
 
+	local function ToolAction( tool, fav_tools, category, item_data )
+		local tool_btn = vgui.Create( 'DButton', category )
+		tool_btn:Dock( TOP )
+		tool_btn:SetText( tool.Text )
+
+		local cnt = tool.Controls
+		local name = tool.ItemName
+
+		tool_btn.id = cnt
+
+		if ( table.HasValue( fav_tools, name ) ) then -- Preset favorite tool
+			tool_btn.fav = true
+		end
+
+		tool_btn.DoClick = function()
+			if ( GetConVar( 'gmod_toolmode' ):GetString() == name ) then
+				return
+			end
+
+			soundPlay()
+
+			spawnmenu.ActivateTool( name )
+
+			RunConsoleCommand( 'frespawnmenu_save_tool', util.TableToJSON( item_data ) )
+
+			tool_cp_sp:Clear()
+
+			if ( tool.CPanelFunction != nil ) then
+				create_tool( tool )
+			end
+		end
+		tool_btn.DoRightClick = function()
+			soundPlay()
+
+			local DM = DermaMenu()
+			DM:SetSkin( 'fsm' )
+			
+			if ( not tool_btn.fav ) then
+				local fav = DM:AddOption( '#frespawnmenu.fav_add', function()
+					soundPlay( 'garrysmod/content_downloaded.wav' )
+
+					table.insert( fav_tools, tool.ItemName )
+
+					file.Write( 'frespawnmenu_fav_tools.json', util.TableToJSON( fav_tools ) )
+
+					tool_btn.fav = true
+				end )
+				fav.Paint = nil
+				fav:SetIcon( 'icon16/star.png' )
+			else
+				local remove_fav = DM:AddOption( '#frespawnmenu.fav_remove', function()
+					soundPlay( 'garrysmod/content_downloaded.wav' )
+
+					table.RemoveByValue( fav_tools, tool.ItemName )
+
+					file.Write( 'frespawnmenu_fav_tools.json', util.TableToJSON( fav_tools ) )
+
+					tool_btn.fav = false
+				end )
+				remove_fav.Paint = nil
+				remove_fav:SetIcon( 'icon16/cross.png' )	
+			end
+
+			DM:Open()
+		end
+	end
+
 	local function tools_create( tool, category_id )
 		local favorites_tool = util.JSONToTable( file.Read( 'frespawnmenu_fav_tools.json', 'DATA' ) or '[]' )
 
@@ -439,70 +507,7 @@ local function openFreMenu()
 			CollapsibleTool:SetLabel( category.Text )
 
 			for item_num, item in ipairs( category ) do
-				local tool_btn = vgui.Create( 'DButton', CollapsibleTool )
-				tool_btn:Dock( TOP )
-				tool_btn:SetText( item.Text )
-
-				local cnt = item.Controls
-				local name = item.ItemName
-
-				tool_btn.id = cnt
-
-				if ( table.HasValue( favorites_tool, name ) ) then -- Preset favorite tool
-					tool_btn.fav = true
-				end
-
-				tool_btn.DoClick = function()
-					if ( GetConVar( 'gmod_toolmode' ):GetString() == name ) then
-						return
-					end
-
-					soundPlay()
-
-					spawnmenu.ActivateTool( name )
-
-					RunConsoleCommand( 'frespawnmenu_save_tool', util.TableToJSON( { category_id, category_num, item_num } ) )
-
-					tool_cp_sp:Clear()
-
-					if ( item.CPanelFunction != nil ) then
-						create_tool( item )
-					end
-				end
-				tool_btn.DoRightClick = function()
-					soundPlay()
-
-					local DM = DermaMenu()
-					DM:SetSkin( 'fsm' )
-					
-					if ( not tool_btn.fav ) then
-						local fav = DM:AddOption( '#frespawnmenu.fav_add', function()
-							soundPlay( 'garrysmod/content_downloaded.wav' )
-
-							table.insert( favorites_tool, item.ItemName )
-
-							file.Write( 'frespawnmenu_fav_tools.json', util.TableToJSON( favorites_tool ) )
-
-							tool_btn.fav = true
-						end )
-						fav.Paint = nil
-						fav:SetIcon( 'icon16/star.png' )
-					else
-						local remove_fav = DM:AddOption( '#frespawnmenu.fav_remove', function()
-							soundPlay( 'garrysmod/content_downloaded.wav' )
-
-							table.RemoveByValue( favorites_tool, item.ItemName )
-
-							file.Write( 'frespawnmenu_fav_tools.json', util.TableToJSON( favorites_tool ) )
-
-							tool_btn.fav = false
-						end )
-						remove_fav.Paint = nil
-						remove_fav:SetIcon( 'icon16/cross.png' )	
-					end
-
-					DM:Open()
-				end
+				ToolAction( item, favorites_tool, CollapsibleTool, { category_id, category_num, item_num } )
 			end
 		end
 	end
@@ -511,7 +516,7 @@ local function openFreMenu()
 		local DM = DermaMenu()
 		DM:SetSkin( 'fsm' )
 
-		for category_id, tool in ipairs( spawnmenu.GetTools() ) do
+		for category_id, tool in ipairs( spawnmenu_tools ) do
 			local btn = DM:AddOption( tool.Label, function()
 				soundPlay()
 
@@ -521,13 +526,41 @@ local function openFreMenu()
 			btn.Paint = nil
 		end
 
+		DM:AddSpacer()
+
+		local favorites_tool = util.JSONToTable( file.Read( 'frespawnmenu_fav_tools.json', 'DATA' ) or '[]' )
+
+		if ( table.Count( favorites_tool ) != 0 ) then
+			local fav_option = DM:AddOption( '#frespawnmenu.favourites', function()
+				soundPlay()
+
+				tool_sp:Clear()
+				
+				local Favorite_Category = vgui.Create( 'DCollapsibleCategory', tool_sp )
+				Favorite_Category:Dock( TOP )
+				Favorite_Category:SetLabel( '#frespawnmenu.favourites' )
+
+				for category_tab_id, tools_tab in ipairs( spawnmenu_tools ) do
+					for category_num, category in pairs( tools_tab.Items ) do
+						for tool_num, tool in pairs( category ) do
+							if ( table.HasValue( favorites_tool, tool.ItemName ) ) then
+								ToolAction( tool, favorites_tool, Favorite_Category, { category_tab_id, category_num, tool_num } )
+							end
+						end
+					end
+				end
+			end )
+			fav_option.Paint = nil
+			fav_option:SetIcon( 'icon16/star.png' )
+		end
+
 		DM:Open()
 	end
 
 	// Setting standard settings when opening for the first time
 
 	local save_tool_data = util.JSONToTable( frespawnmenu_save_tool:GetString() )
-	local active_category = spawnmenu.GetTools()[ save_tool_data[ 1 ] ] or spawnmenu.GetTools()[ 1 ]
+	local active_category = spawnmenu_tools[ save_tool_data[ 1 ] ] or spawnmenu_tools[ 1 ]
 	local active_tool_category = active_category.Items[ save_tool_data[ 2 ] ] or active_category.Items[ 1 ]
 	local active_tool = active_tool_category[ save_tool_data[ 3 ] ] or active_tool_category[ 1 ]
 
