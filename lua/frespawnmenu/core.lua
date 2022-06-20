@@ -587,8 +587,6 @@ local function openFreMenu()
 		end
 
 		for m, tab_par in pairs( tabs_list ) do
-			tab_par.Panel:SetSkin( 'fsm' )
-
 			if ( tab_par.Name == frespawnmenu_content:GetString() ) then
 				TabsSheet:SetActiveTab( tab_par.Tab )
 			end
