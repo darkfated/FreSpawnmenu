@@ -227,6 +227,24 @@ local function openFreMenu()
 			end
 			btn_item.id = name
 
+			btn_item.PaintOver = function()
+				if ( spawn_div:GetDragging() ) then
+					btn_item:SetWide( size_name + 10 + btn_item:GetTall() )
+
+					tabs_panel.user_wide = 0
+
+					for name, v in SortedPairsByMemberValue( spawnmenu_tabs, 'Order' ) do
+						tabs_panel.user_wide = tabs_panel.user_wide + size_name + 26 + btn_item:GetTall()
+
+						if ( frespawnmenu_tab_icon:GetBool() ) then
+							tabs_panel.user_wide = tabs_panel.user_wide + 26
+						end
+					end
+
+					tabs_panel.user_wide = tabs_panel.user_wide + 16
+				end
+			end
+
 			if ( frespawnmenu_tab_icon:GetBool() ) then
 				local icon_pan = vgui.Create( 'DButton', tab_panel_sp )
 				icon_pan:SetWide( 22 )
@@ -238,10 +256,6 @@ local function openFreMenu()
 					surface.SetDrawColor( self.Depressed and frespawnmenu_content:GetString() != name and color_icon_depressed or color_white )
 					surface.SetMaterial( Material( v.Icon ) )
 					surface.DrawTexturedRect( 4, h * 0.5 - 8, w - 8, 16 )
-
-					if ( spawn_div:GetDragging() ) then
-						btn_item:SetWide( size_name + 10 + btn_item:GetTall() )
-					end
 				end
 				icon_pan.DoClick = function()
 					OpenContent( name, v )
