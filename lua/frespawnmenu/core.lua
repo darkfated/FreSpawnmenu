@@ -95,6 +95,8 @@ local function openFreMenu()
 		self:SetKeyboardInputEnabled( false )
 	end
 
+	FreSpawnMenu.Tabs = {}
+
 	// Separation into Spawn and Tool part
 
 	local global_div = vgui.Create( 'DHorizontalDivider', FreSpawnMenu )
@@ -175,21 +177,22 @@ local function openFreMenu()
 
 		surface.SetFont( 'Default' )
 
-		local function OpenContent( name, tab )
-			if ( frespawnmenu_content:GetString() == name ) then
+		local function OpenContent( tab_id )
+			local TabTable = FreSpawnMenu.Tabs[ tab_id ]
+
+			if ( frespawnmenu_content:GetString() == TabTable.Title ) then
 				return
 			end
 
 			soundPlay( 'buttons/lightswitch2.wav' )
 
-			action_panel_content:Clear()
+			RunConsoleCommand( 'frespawnmenu_content', TabTable.Title )
 
-			local content = tab.Function()
-			content:SetParent( action_panel_content )
-			content:Dock( FILL )
-			content:SetSkin( 'fsm' )
+			for k, tab in pairs( FreSpawnMenu.Tabs ) do
+				FreSpawnMenu.Tabs[ k ].Panel:SetVisible( false )
+			end
 
-			RunConsoleCommand( 'frespawnmenu_content', name )
+			TabTable.Panel:SetVisible( true )
 		end
 
 		local function OpenTabsDermaMenu()
@@ -197,17 +200,34 @@ local function openFreMenu()
 			DM:SetSkin( 'fsm' )
 
 			for name_tab, elem in SortedPairsByMemberValue( spawnmenu_tabs, 'Order' ) do
-				if ( name_tab != frespawnmenu_content:GetString() ) then
-					DM:AddOption( name_tab, function()
-						OpenContent( name_tab, elem )
-					end ):SetIcon( elem.Icon )
-				end
+				DM:AddOption( name_tab, function()
+					OpenContent( elem.num )
+				end ):SetIcon( elem.Icon )
 			end
 
 			DM:Open()
 		end
 
-		for name, v in SortedPairsByMemberValue( spawnmenu_tabs, 'Order' ) do
+		local tab_num = 1
+
+		for name, tab in SortedPairsByMemberValue( spawnmenu_tabs, 'Order' ) do
+			tab.num = tab_num
+
+			local Tab = {}
+			Tab.Title = name
+
+			Tab.Panel = vgui.Create( 'DPanel', action_panel_content )
+			Tab.Panel:Dock( FILL )
+			Tab.Panel.Paint = nil
+			Tab.Panel:SetVisible( false )
+
+			local content = tab.Function()
+			content:SetParent( Tab.Panel )
+			content:Dock( FILL )
+			content:SetSkin( 'fsm' )
+
+			table.insert( FreSpawnMenu.Tabs, Tab )
+
 			local size_name = surface.GetTextSize( name )
 
 			local btn_item = vgui.Create( 'DButton', tab_panel_sp )
@@ -220,7 +240,7 @@ local function openFreMenu()
 			tabs_panel.user_wide = tabs_panel.user_wide + btn_item_wide + 4
 
 			btn_item.DoClick = function()
-				OpenContent( name, v )
+				OpenContent( tab.num )
 			end
 			btn_item.DoRightClick = function()
 				OpenTabsDermaMenu()
@@ -251,14 +271,16 @@ local function openFreMenu()
 
 				tabs_panel.user_wide = tabs_panel.user_wide + 26
 
+				local IconMat = Material( tab.Icon )
+
 				icon_pan:SetText( '' )
 				icon_pan.Paint = function( self, w, h )
 					surface.SetDrawColor( self.Depressed and frespawnmenu_content:GetString() != name and color_icon_depressed or color_white )
-					surface.SetMaterial( Material( v.Icon ) )
+					surface.SetMaterial( IconMat )
 					surface.DrawTexturedRect( 4, h * 0.5 - 8, w - 8, 16 )
 				end
 				icon_pan.DoClick = function()
-					OpenContent( name, v )
+					OpenContent( tab.num )
 				end
 				icon_pan.DoRightClick = function()
 					OpenTabsDermaMenu()
@@ -268,6 +290,8 @@ local function openFreMenu()
 			end
 
 			tab_panel_sp:AddPanel( btn_item )
+
+			tab_num = tab_num + 1
 		end
 
 		tabs_panel.user_wide = tabs_panel.user_wide + 16
@@ -582,10 +606,7 @@ local function openFreMenu()
 	create_tool( active_tool )
 
 	if ( !frespawnmenu_simple_tabs:GetBool() ) then
-		local content = spawnmenu_tabs[ frespawnmenu_content:GetString() ].Function()
-		content:SetParent( action_panel_content )
-		content:Dock( FILL )
-		content:SetSkin( 'fsm' )
+		FreSpawnMenu.Tabs[ 1 ].Panel:SetVisible( true )
 	else
 		local TabsSheet = vgui.Create( 'CreationMenu', action_panel_content_scroll )
 		TabsSheet:Dock( FILL )
