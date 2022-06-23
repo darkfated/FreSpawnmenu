@@ -199,19 +199,58 @@ local function openFreMenu()
 			local DM = DermaMenu()
 			DM:SetSkin( 'fsm' )
 
+			local renamed_tabs = util.JSONToTable( file.Read( 'frespawnmenu_renamed_tabs.json', 'DATA' ) or '[]' )
+
 			for name_tab, elem in SortedPairsByMemberValue( spawnmenu_tabs, 'Order' ) do
-				DM:AddOption( name_tab, function()
+				local ChildOption, ParentOption = DM:AddSubMenu( renamed_tabs[ name_tab ] and renamed_tabs[ name_tab ] or name_tab, function()
 					OpenContent( elem.num )
-				end ):SetIcon( elem.Icon )
+				end )
+				ParentOption:SetIcon( elem.Icon )
+				ParentOption.right_clicked = false
+				ParentOption.DoRightClick = function()
+					if ( !ParentOption.right_clicked ) then
+						soundPlay()
+
+						ChildOption:AddOption( 'Rename', function()
+							soundPlay()
+
+							Derma_StringRequest(
+								'FreSpawnMenu', 
+								'An empty field is equal to the standard name',
+								renamed_tabs[ name_tab ] and renamed_tabs[ name_tab ] or '',
+								function( text )
+									if ( text != '' ) then
+										renamed_tabs[ name_tab ] = text
+
+										file.Write( 'frespawnmenu_renamed_tabs.json', util.TableToJSON( renamed_tabs ) )
+									else
+										table.RemoveByValue( renamed_tabs, renamed_tabs[ name_tab ] )
+
+										file.Write( 'frespawnmenu_renamed_tabs.json', util.TableToJSON( renamed_tabs ) )
+									end
+
+									FreSpawnMenu:Remove()
+								end
+							):SetSkin( 'fsm' )
+						end ):SetIcon( 'icon16/book_edit.png' )
+
+						ParentOption.right_clicked = true
+					end
+				end
 			end
 
 			DM:Open()
 		end
 
 		local tab_num = 1
+		local renamed_tabs = util.JSONToTable( file.Read( 'frespawnmenu_renamed_tabs.json', 'DATA' ) or '[]' )
 
 		for name, tab in SortedPairsByMemberValue( spawnmenu_tabs, 'Order' ) do
 			tab.num = tab_num
+
+			if ( renamed_tabs[ name ] ) then
+				name = renamed_tabs[ name ]   
+			end
 
 			local Tab = {}
 			Tab.Title = name
