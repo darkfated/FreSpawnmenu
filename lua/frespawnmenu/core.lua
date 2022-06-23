@@ -221,13 +221,11 @@ local function openFreMenu()
 								function( text )
 									if ( text != '' ) then
 										renamed_tabs[ name_tab ] = text
-
-										file.Write( 'frespawnmenu_renamed_tabs.json', util.TableToJSON( renamed_tabs ) )
 									else
 										table.RemoveByValue( renamed_tabs, renamed_tabs[ name_tab ] )
-
-										file.Write( 'frespawnmenu_renamed_tabs.json', util.TableToJSON( renamed_tabs ) )
 									end
+
+									file.Write( 'frespawnmenu_renamed_tabs.json', util.TableToJSON( renamed_tabs ) )
 
 									FreSpawnMenu:Remove()
 								end
