@@ -216,6 +216,12 @@ SKIN.Colours.Window = {}
 SKIN.Colours.Window.TitleActive = GWEN.TextureColor( 4 + 8 * 0, 508 )
 SKIN.Colours.Window.TitleInactive = GWEN.TextureColor( 4 + 8 * 1, 508 )
 
+SKIN.Colours.Button = {}
+SKIN.Colours.Button.Normal = GWEN.TextureColor( 4 + 8 * 2, 508 )
+SKIN.Colours.Button.Hover = GWEN.TextureColor( 4 + 8 * 3, 508 )
+SKIN.Colours.Button.Down = GWEN.TextureColor( 4 + 8 * 2, 500 )
+SKIN.Colours.Button.Disabled = GWEN.TextureColor( 4 + 8 * 3, 500 )
+
 SKIN.Colours.Tab = {}
 SKIN.Colours.Tab.Active = {}
 SKIN.Colours.Tab.Active.Normal = GWEN.TextureColor( 4 + 8 * 4, 508 )
