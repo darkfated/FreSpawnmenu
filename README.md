@@ -7,8 +7,9 @@ The first of its kind independent new SpawnMenu for the Gmod game
 [Steam Workshop](https://steamcommunity.com/sharedfiles/filedetails/?id=2613708971)
 
 ## Language support
-| Flag  | Region |
-| :-------------: | :-------------: | ------------- |
+
+| Flag | Region |
+| :-------------: | ------------- |
 | ![](https://raw.githubusercontent.com/yammadev/flag-icons/master/png/GB%402x.png) | English
 | ![](https://raw.githubusercontent.com/yammadev/flag-icons/master/png/RU%402x.png) | Russian
 | ![](https://raw.githubusercontent.com/yammadev/flag-icons/master/png/TR%402x.png) | Turkey
