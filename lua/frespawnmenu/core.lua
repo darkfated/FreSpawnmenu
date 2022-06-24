@@ -9,6 +9,7 @@ local frespawnmenu_tab_icon = CreateClientConVar( 'frespawnmenu_tab_icon', 1, tr
 local frespawnmenu_scrollbar_tools = CreateClientConVar( 'frespawnmenu_scrollbar_tools', 0, true )
 local frespawnmenu_custom_sound = CreateClientConVar( 'frespawnmenu_custom_sound', 1, true )
 local frespawnmenu_simple_tabs = CreateClientConVar( 'frespawnmenu_simple_tabs', 0, true )
+local frespawnmenu_derma_skin = CreateClientConVar( 'frespawnmenu_derma_skin', 'fsm', true )
 
 CreateClientConVar( 'frespawnmenu_blur', 1, true )
 CreateClientConVar( 'frespawnmenu_frame', 0, true )
@@ -41,6 +42,7 @@ local function openFreMenu()
 	local spawn_w = math.min( scrw - 10, scrw * 0.92 ) * frespawnmenu_size:GetFloat()
 	local spawnmenu_tabs = spawnmenu.GetCreationTabs()
 	local spawnmenu_tools = spawnmenu.GetTools()
+	local menu_skin = frespawnmenu_derma_skin:GetString()
 
 	local function spawnmenu_set_standart_size()
 		FreSpawnMenu:SetSize( spawn_w, math.min( scrh - 10, scrh * 0.95 ) * frespawnmenu_size:GetFloat() )
@@ -76,7 +78,7 @@ local function openFreMenu()
 
 	FreSpawnMenu:Center()
 	FreSpawnMenu:MakePopup()
-	FreSpawnMenu:SetSkin( 'fsm' )
+	FreSpawnMenu:SetSkin( menu_skin )
 	FreSpawnMenu:SetKeyboardInputEnabled( false )
 
 	function FreSpawnMenu:StartKeyFocus( pPanel )
@@ -197,7 +199,7 @@ local function openFreMenu()
 
 		local function OpenTabsDermaMenu()
 			local DM = DermaMenu()
-			DM:SetSkin( 'fsm' )
+			DM:SetSkin( menu_skin )
 
 			local renamed_tabs = util.JSONToTable( file.Read( 'frespawnmenu_renamed_tabs.json', 'DATA' ) or '[]' )
 
@@ -232,7 +234,7 @@ local function openFreMenu()
 
 									FreSpawnMenu:Remove()
 								end
-							):SetSkin( 'fsm' )
+							):SetSkin( menu_skin )
 						end ):SetIcon( 'icon16/book_edit.png' )
 					end
 				end
@@ -263,7 +265,7 @@ local function openFreMenu()
 			local content = tab.Function()
 			content:SetParent( Tab.Panel )
 			content:Dock( FILL )
-			content:SetSkin( 'fsm' )
+			content:SetSkin( menu_skin )
 
 			table.insert( FreSpawnMenu.Tabs, Tab )
 
@@ -360,7 +362,7 @@ local function openFreMenu()
 			DM:SetDeleteSelf( false )
 			DM:SetDrawColumn( true )
 			DM:Hide()
-			DM:SetSkin( 'fsm' )
+			DM:SetSkin( menu_skin )
 	
 			self.Menus[ label ] = DM
 		
@@ -411,7 +413,7 @@ local function openFreMenu()
 					local ContextMenu_Window = vgui.Create( 'DPanel', action_panel_content )
 					ContextMenu_Window:SetSize( action_panel_content:GetSize() )
 					ContextMenu_Window:Dock( FILL )
-					ContextMenu_Window:SetSkin( 'fsm' )
+					ContextMenu_Window:SetSkin( menu_skin )
 					ContextMenu_Window.Paint = nil
 
 					function ContextMenu_Window:SetTitle()
@@ -541,7 +543,7 @@ local function openFreMenu()
 			soundPlay()
 
 			local DM = DermaMenu()
-			DM:SetSkin( 'fsm' )
+			DM:SetSkin( menu_skin )
 			
 			if ( not tool_btn.fav ) then
 				local fav = DM:AddOption( '#frespawnmenu.fav_add', function()
@@ -591,7 +593,7 @@ local function openFreMenu()
 
 	tool_CategoryButton.DoClick = function()
 		local DM = DermaMenu()
-		DM:SetSkin( 'fsm' )
+		DM:SetSkin( menu_skin )
 
 		for category_id, tool in ipairs( spawnmenu_tools ) do
 			local btn = DM:AddOption( tool.Label, function()
@@ -770,5 +772,23 @@ hook.Add( 'PopulateToolMenu', 'FreSpawnMenuTool', function()
 		panel:AddControl( 'CheckBox', { Label = '#frespawnmenu.tool.tab_icon', Command = 'frespawnmenu_tab_icon' } )
 		panel:AddControl( 'CheckBox', { Label = '#frespawnmenu.tool.scrollbar_tools', Command = 'frespawnmenu_scrollbar_tools' } )
 		panel:AddControl( 'CheckBox', { Label = '#frespawnmenu.tool.simple_tabs', Command = 'frespawnmenu_simple_tabs' } )
+
+		panel:AddControl( 'Header', { Description = 'Derma Skin:' } )
+		
+		local SkinChanger = vgui.Create( 'DComboBox', panel )
+		SkinChanger:Dock( TOP )
+		SkinChanger:DockMargin( 0, 8, 0, 0 )
+		SkinChanger:SetValue( frespawnmenu_derma_skin:GetString() )
+		SkinChanger.OnSelect = function( self, index, value, data )
+			RunConsoleCommand( 'frespawnmenu_derma_skin', data )
+
+			if ( IsValid( FreSpawnMenu ) ) then
+				FreSpawnMenu:Remove()
+			end
+		end
+
+		for skin, skindata in pairs( derma.SkinList ) do
+			SkinChanger:AddChoice( skindata.PrintName, skin )
+		end
 	end )
 end )
