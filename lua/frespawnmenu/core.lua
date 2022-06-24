@@ -39,10 +39,19 @@ local function openFreMenu()
 
 	achievements.SpawnMenuOpen()
 
+	if ( !file.Exists( 'frespawnmenu_tabs.txt', 'DATA' ) ) then
+		local data_tabs = {}
+		data_tabs.renamed = {}
+		data_tabs.notvisible = {}
+
+		file.Write( 'frespawnmenu_tabs.txt', util.TableToJSON( data_tabs ) )
+	end
+
 	local spawn_w = math.min( scrw - 10, scrw * 0.92 ) * frespawnmenu_size:GetFloat()
 	local spawnmenu_tabs = spawnmenu.GetCreationTabs()
 	local spawnmenu_tools = spawnmenu.GetTools()
 	local menu_skin = frespawnmenu_derma_skin:GetString()
+	local data_tabs = util.JSONToTable( file.Read( 'frespawnmenu_tabs.txt', 'DATA' ) or '[]' )
 
 	local function spawnmenu_set_standart_size()
 		FreSpawnMenu:SetSize( spawn_w, math.min( scrh - 10, scrh * 0.95 ) * frespawnmenu_size:GetFloat() )
@@ -201,57 +210,94 @@ local function openFreMenu()
 			local DM = DermaMenu()
 			DM:SetSkin( menu_skin )
 
-			local renamed_tabs = util.JSONToTable( file.Read( 'frespawnmenu_renamed_tabs.json', 'DATA' ) or '[]' )
-
 			for name_tab, elem in SortedPairsByMemberValue( spawnmenu_tabs, 'Order' ) do
-				local ChildOption, ParentOption = DM:AddSubMenu( renamed_tabs[ name_tab ] and renamed_tabs[ name_tab ] or name_tab, function()
-					OpenContent( elem.num )
-				end )
-				ParentOption:SetIcon( elem.Icon )
-				ParentOption.right_clicked = false
-				ParentOption.DoRightClick = function()
-					if ( !ParentOption.right_clicked ) then
-						soundPlay()
+				if ( !table.HasValue( data_tabs.notvisible, name_tab ) ) then
 
-						ParentOption.right_clicked = true
-						ParentOption.ArrowActive = true
-
-						ChildOption:AddOption( 'Rename', function()
+					local ChildOption, ParentOption = DM:AddSubMenu( data_tabs.renamed[ name_tab ] and data_tabs.renamed[ name_tab ] or name_tab, function()
+						OpenContent( elem.num )
+					end )
+					ParentOption:SetIcon( elem.Icon )
+					ParentOption.right_clicked = false
+					ParentOption.DoRightClick = function()
+						if ( !ParentOption.right_clicked ) then
 							soundPlay()
 
-							Derma_StringRequest(
-								'FreSpawnMenu', 
-								'An empty field is equal to the standard name',
-								renamed_tabs[ name_tab ] and renamed_tabs[ name_tab ] or '',
-								function( text )
-									if ( text != '' ) then
-										renamed_tabs[ name_tab ] = text
-									else
-										table.RemoveByValue( renamed_tabs, renamed_tabs[ name_tab ] )
+							ParentOption.right_clicked = true
+							ParentOption.ArrowActive = true
+
+							ChildOption:AddOption( 'Rename', function()
+								soundPlay()
+
+								Derma_StringRequest(
+									'FreSpawnMenu', 
+									'An empty field is equal to the standard name',
+									data_tabs.renamed[ name_tab ] and data_tabs.renamed[ name_tab ] or '',
+									function( text )
+										if ( text != '' ) then
+											data_tabs.renamed[ name_tab ] = text
+										else
+											table.RemoveByValue( data_tabs.renamed, data_tabs.renamed[ name_tab ] )
+										end
+
+										file.Write( 'frespawnmenu_tabs.txt', util.TableToJSON( data_tabs ) )
+
+										FreSpawnMenu:Remove()
 									end
+								):SetSkin( menu_skin )
+							end ):SetIcon( 'icon16/book_edit.png' )
 
-									file.Write( 'frespawnmenu_renamed_tabs.json', util.TableToJSON( renamed_tabs ) )
-
-									FreSpawnMenu:Remove()
+							ChildOption:AddOption( "Not display", function()
+								soundPlay()
+								
+								if ( table.HasValue( data_tabs.notvisible, name_tab ) ) then
+									for k, tab in pairs( data_tabs.notvisible ) do
+										if ( tab == name_tab ) then
+											table.remove( data_tabs.notvisible, k )
+										end
+									end
+								else
+									table.insert( data_tabs.notvisible, name_tab )
 								end
-							):SetSkin( menu_skin )
-						end ):SetIcon( 'icon16/book_edit.png' )
+
+								file.Write( 'frespawnmenu_tabs.txt', util.TableToJSON( data_tabs ) )
+
+								FreSpawnMenu:Remove()
+							end ):SetIcon( 'icon16/camera.png' )
+						end
 					end
+					ParentOption.ArrowActive = false
 				end
-				ParentOption.ArrowActive = false
+			end
+
+			DM:AddSpacer()
+
+			for name_tab, elem in SortedPairsByMemberValue( spawnmenu_tabs, 'Order' ) do
+				if ( table.HasValue( data_tabs.notvisible, name_tab ) ) then
+					DM:AddOption( name_tab, function()
+						for k, tab in pairs( data_tabs.notvisible ) do
+							if ( tab == name_tab ) then
+								table.remove( data_tabs.notvisible, k )
+							end
+						end
+
+						file.Write( 'frespawnmenu_tabs.txt', util.TableToJSON( data_tabs ) )
+
+						FreSpawnMenu:Remove()
+					end ):SetIcon( elem.Icon )
+				end
 			end
 
 			DM:Open()
 		end
 
-		local tab_num = 1
-		local renamed_tabs = util.JSONToTable( file.Read( 'frespawnmenu_renamed_tabs.json', 'DATA' ) or '[]' )
+		local tab_num = 0
+		local data_tabs = util.JSONToTable( file.Read( 'frespawnmenu_tabs.txt', 'DATA' ) or '[]' )
 
 		for name, tab in SortedPairsByMemberValue( spawnmenu_tabs, 'Order' ) do
-			tab.num = tab_num
+			tab_num = tab_num + 1
 
-			if ( renamed_tabs[ name ] ) then
-				name = renamed_tabs[ name ]   
+			if ( data_tabs.renamed[ name ] ) then
+				name = data_tabs.renamed[ name ]   
 			end
 
 			local Tab = {}
@@ -269,70 +315,70 @@ local function openFreMenu()
 
 			table.insert( FreSpawnMenu.Tabs, Tab )
 
-			local size_name = surface.GetTextSize( name )
+			if ( !table.HasValue( data_tabs.notvisible, name ) ) then
+				local size_name = surface.GetTextSize( name )
 
-			local btn_item = vgui.Create( 'DButton', tab_panel_sp )
+				local btn_item = vgui.Create( 'DButton', tab_panel_sp )
 
-			local btn_item_wide = size_name + 10 + btn_item:GetTall()
+				local btn_item_wide = size_name + 10 + btn_item:GetTall()
 
-			btn_item:SetWide( btn_item_wide )
-			btn_item:SetText( name )
+				btn_item:SetWide( btn_item_wide )
+				btn_item:SetText( name )
 
-			tabs_panel.user_wide = tabs_panel.user_wide + btn_item_wide + 4
+				tabs_panel.user_wide = tabs_panel.user_wide + btn_item_wide + 4
 
-			btn_item.DoClick = function()
-				OpenContent( tab.num )
-			end
-			btn_item.DoRightClick = function()
-				OpenTabsDermaMenu()
-			end
-			btn_item.id = name
-
-			btn_item.PaintOver = function()
-				if ( spawn_div:GetDragging() ) then
-					btn_item:SetWide( size_name + 10 + btn_item:GetTall() )
-
-					tabs_panel.user_wide = 0
-
-					for name, v in SortedPairsByMemberValue( spawnmenu_tabs, 'Order' ) do
-						tabs_panel.user_wide = tabs_panel.user_wide + size_name + 26 + btn_item:GetTall()
-
-						if ( frespawnmenu_tab_icon:GetBool() ) then
-							tabs_panel.user_wide = tabs_panel.user_wide + 26
-						end
-					end
-
-					tabs_panel.user_wide = tabs_panel.user_wide + 16
-				end
-			end
-
-			if ( frespawnmenu_tab_icon:GetBool() ) then
-				local icon_pan = vgui.Create( 'DButton', tab_panel_sp )
-				icon_pan:SetWide( 22 )
-
-				tabs_panel.user_wide = tabs_panel.user_wide + 26
-
-				local IconMat = Material( tab.Icon )
-
-				icon_pan:SetText( '' )
-				icon_pan.Paint = function( self, w, h )
-					surface.SetDrawColor( self.Depressed and frespawnmenu_content:GetString() != name and color_icon_depressed or color_white )
-					surface.SetMaterial( IconMat )
-					surface.DrawTexturedRect( 4, h * 0.5 - 8, w - 8, 16 )
-				end
-				icon_pan.DoClick = function()
+				btn_item.DoClick = function()
 					OpenContent( tab.num )
 				end
-				icon_pan.DoRightClick = function()
+				btn_item.DoRightClick = function()
 					OpenTabsDermaMenu()
 				end
+				btn_item.id = name
 
-				tab_panel_sp:AddPanel( icon_pan )
+				btn_item.PaintOver = function()
+					if ( spawn_div:GetDragging() ) then
+						btn_item:SetWide( size_name + 10 + btn_item:GetTall() )
+
+						tabs_panel.user_wide = 0
+
+						for name, v in SortedPairsByMemberValue( spawnmenu_tabs, 'Order' ) do
+							tabs_panel.user_wide = tabs_panel.user_wide + size_name + 26 + btn_item:GetTall()
+
+							if ( frespawnmenu_tab_icon:GetBool() ) then
+								tabs_panel.user_wide = tabs_panel.user_wide + 26
+							end
+						end
+
+						tabs_panel.user_wide = tabs_panel.user_wide + 16
+					end
+				end
+
+				if ( frespawnmenu_tab_icon:GetBool() ) then
+					local icon_pan = vgui.Create( 'DButton', tab_panel_sp )
+					icon_pan:SetWide( 22 )
+
+					tabs_panel.user_wide = tabs_panel.user_wide + 26
+
+					local IconMat = Material( tab.Icon )
+
+					icon_pan:SetText( '' )
+					icon_pan.Paint = function( self, w, h )
+						surface.SetDrawColor( self.Depressed and frespawnmenu_content:GetString() != name and color_icon_depressed or color_white )
+						surface.SetMaterial( IconMat )
+						surface.DrawTexturedRect( 4, h * 0.5 - 8, w - 8, 16 )
+					end
+					icon_pan.DoClick = function()
+						OpenContent( tab.num )
+					end
+					icon_pan.DoRightClick = function()
+						OpenTabsDermaMenu()
+					end
+
+					tab_panel_sp:AddPanel( icon_pan )
+				end
+
+				tab_panel_sp:AddPanel( btn_item )
 			end
-
-			tab_panel_sp:AddPanel( btn_item )
-
-			tab_num = tab_num + 1
 		end
 
 		tabs_panel.user_wide = tabs_panel.user_wide + 16
