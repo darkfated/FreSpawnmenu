@@ -436,6 +436,10 @@ end
 	MenuRightArrow
 -----------------------------------------------------------]]
 function SKIN:PaintMenuRightArrow( panel, w, h )
+	if ( panel:GetParent().ArrowActive == false ) then
+		return
+	end
+
 	self.tex.Menu.RightArrow( 0, 0, w, h )
 end
 

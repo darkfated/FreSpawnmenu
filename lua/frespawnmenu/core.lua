@@ -211,6 +211,9 @@ local function openFreMenu()
 					if ( !ParentOption.right_clicked ) then
 						soundPlay()
 
+						ParentOption.right_clicked = true
+						ParentOption.ArrowActive = true
+
 						ChildOption:AddOption( 'Rename', function()
 							soundPlay()
 
@@ -231,10 +234,9 @@ local function openFreMenu()
 								end
 							):SetSkin( 'fsm' )
 						end ):SetIcon( 'icon16/book_edit.png' )
-
-						ParentOption.right_clicked = true
 					end
 				end
+				ParentOption.ArrowActive = false
 			end
 
 			DM:Open()
