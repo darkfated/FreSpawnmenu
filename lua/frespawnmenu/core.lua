@@ -295,6 +295,7 @@ local function openFreMenu()
 
 		for name, tab in SortedPairsByMemberValue( spawnmenu_tabs, 'Order' ) do
 			tab_num = tab_num + 1
+			tab.num = tab_num
 
 			if ( data_tabs.renamed[ name ] ) then
 				name = data_tabs.renamed[ name ]   
