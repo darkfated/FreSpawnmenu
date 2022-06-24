@@ -693,7 +693,11 @@ local function openFreMenu()
 	create_tool( active_tool )
 
 	if ( !frespawnmenu_simple_tabs:GetBool() ) then
-		FreSpawnMenu.Tabs[ 1 ].Panel:SetVisible( true )
+		for k, tab in pairs( FreSpawnMenu.Tabs ) do
+			if ( tab.Title == frespawnmenu_content:GetString() ) then
+				FreSpawnMenu.Tabs[ k ].Panel:SetVisible( true )
+			end
+		end
 	else
 		local TabsSheet = vgui.Create( 'CreationMenu', action_panel_content_scroll )
 		TabsSheet:Dock( FILL )
