@@ -12,10 +12,11 @@ local frespawnmenu_simple_tabs = CreateClientConVar( 'frespawnmenu_simple_tabs',
 local frespawnmenu_derma_skin = CreateClientConVar( 'frespawnmenu_derma_skin', 'fsm', true )
 local frespawnmenu_tool_drawer = CreateClientConVar( 'frespawnmenu_tool_drawer', 0, true )
 local frespawnmenu_fav_startup = CreateClientConVar( 'frespawnmenu_fav_startup', 0, true )
+local frespawnmenu_frame = CreateClientConVar( 'frespawnmenu_frame', 0, true )
 
 CreateClientConVar( 'frespawnmenu_blur', 1, true )
-CreateClientConVar( 'frespawnmenu_frame', 0, true )
 CreateClientConVar( 'frespawnmenu_adaptive_wide_nav', 1, true )
+CreateClientConVar( 'frespawnmenu_frame_blur', 1, true )
 
 local color_white = Color(255,255,255)
 local color_gray = Color(70,70,70,200)
@@ -59,10 +60,14 @@ local function openFreMenu()
 		FreSpawnMenu:SetSize( spawn_w, math.min( scrh - 10, scrh * 0.95 ) * frespawnmenu_size:GetFloat() )
 	end
 
-	if ( GetConVar( 'frespawnmenu_frame' ):GetBool() ) then
+	if ( frespawnmenu_frame:GetBool() ) then
 		FreSpawnMenu = vgui.Create( 'DFrame' )
 		FreSpawnMenu:SetTitle( 'FreSpawnMenu' )
-		FreSpawnMenu:SetBackgroundBlur( true )
+
+		if ( GetConVar( 'frespawnmenu_frame_blur' ):GetBool() ) then
+			FreSpawnMenu:SetBackgroundBlur( true )
+		end
+
 		FreSpawnMenu:SetScreenLock( true )
 		FreSpawnMenu.btnMaxim:SetDisabled( false )
 		FreSpawnMenu.btnMaxim.DoClick = function()
@@ -877,6 +882,11 @@ hook.Add( 'PopulateToolMenu', 'FreSpawnMenuTool', function()
 
 		panel:AddControl( 'Header', { Description = '#frespawnmenu.tool.rebuild_info' } )
 		panel:AddControl( 'CheckBox', { Label = '#frespawnmenu.tool.window', Command = 'frespawnmenu_frame' } )
+
+		if ( frespawnmenu_frame:GetBool() ) then
+			panel:AddControl( 'CheckBox', { Label = '#frespawnmenu.tool.window_blur', Command = 'frespawnmenu_frame_blur' } )
+		end
+
 		panel:AddControl( 'CheckBox', { Label = '#frespawnmenu.tool.menubar', Command = 'frespawnmenu_menubar' } )
 		panel:AddControl( 'Slider', { Label = '#frespawnmenu.tool.size', Command = 'frespawnmenu_size', Min = 0.5, Max = 1.05, Type = 'float' } )
 		panel:AddControl( 'CheckBox', { Label = '#frespawnmenu.tool.tab_icon', Command = 'frespawnmenu_tab_icon' } )
