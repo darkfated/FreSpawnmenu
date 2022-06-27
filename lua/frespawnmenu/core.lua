@@ -695,22 +695,25 @@ local function openFreMenu()
 		local ToolDrawer = vgui.Create( 'DDrawer', ToolPanel )
 		ToolDrawer:SetOpenTime( 0.2 )
 		ToolDrawer.ToggleButton:SetText( '' )
+		ToolDrawer.tall = 18
 
 		local DrawerPanel = vgui.Create( 'DPanel', ToolDrawer )
 		DrawerPanel:Dock( FILL )
 
-		local DrawerSP = vgui.Create( 'DScrollPanel', DrawerPanel )
-		DrawerSP:Dock( FILL )
-		DrawerSP:DockMargin( 6, 12, 6, 6 )
-		DrawerSP:GetVBar():SetWide( 0 )
-		DrawerSP.num = 0
+		local DrawerContentPanel = vgui.Create( 'DPanel', DrawerPanel )
+		DrawerContentPanel:Dock( FILL )
+		DrawerContentPanel:DockMargin( 6, 12, 6, 6 )
+		DrawerContentPanel.Paint = nil
+		DrawerContentPanel.num = 0
 
 		local function CreateDrawerCheckBox( title, cvar )
-			local DrawerCheckbox = vgui.Create( 'DCheckBoxLabel', DrawerSP )
+			local DrawerCheckbox = vgui.Create( 'DCheckBoxLabel', DrawerContentPanel )
 			DrawerCheckbox:Dock( TOP )
 
-			if ( DrawerSP.num > 0 ) then
+			if ( DrawerContentPanel.num > 0 ) then
 				DrawerCheckbox:DockMargin( 0, 8, 0, 0 )
+
+				ToolDrawer.tall = ToolDrawer.tall + 8
 			end
 
 			DrawerCheckbox:SetText( title )
@@ -723,13 +726,16 @@ local function openFreMenu()
 				RunConsoleCommand( 'frespawnmenu_rebuild' )
 			end
 
-			DrawerSP.num = DrawerSP.num + 1
+			DrawerContentPanel.num = DrawerContentPanel.num + 1
+			ToolDrawer.tall = ToolDrawer.tall + 15
 		end
 
 		CreateDrawerCheckBox( '#frespawnmenu.tool.tool_right', 'frespawnmenu_tool_right' )
 		CreateDrawerCheckBox( '#frespawnmenu.tool.scrollbar_tools', 'frespawnmenu_scrollbar_tools' )
 		CreateDrawerCheckBox( 'Tool Drawer', 'frespawnmenu_tool_drawer' )
 		CreateDrawerCheckBox( '#frespawnmenu.tool.fav_startup', 'frespawnmenu_fav_startup' )
+
+		ToolDrawer:SetOpenSize( ToolDrawer.tall )
 	end
 
 	// Setting standard settings when opening for the first time
