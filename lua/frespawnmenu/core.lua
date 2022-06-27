@@ -227,12 +227,12 @@ local function openFreMenu()
 							ParentOption.right_clicked = true
 							ParentOption.ArrowActive = true
 
-							ChildOption:AddOption( 'Rename', function()
+							ChildOption:AddOption( '#frespawnmenu.rename', function()
 								soundPlay()
 
 								Derma_StringRequest(
 									'FreSpawnMenu',
-									'An empty field is equal to the standard name',
+									'#frespawnmenu.rename_description',
 									data_tabs.renamed[ name_tab ] and data_tabs.renamed[ name_tab ] or '',
 									function( text )
 										if ( text != '' ) then
@@ -248,7 +248,7 @@ local function openFreMenu()
 								):SetSkin( menu_skin )
 							end ):SetIcon( 'icon16/book_edit.png' )
 
-							ChildOption:AddOption( "Not display", function()
+							ChildOption:AddOption( '#frespawnmenu.not_display', function()
 								soundPlay()
 
 								if ( table.HasValue( data_tabs.notvisible, name_tab ) ) then
