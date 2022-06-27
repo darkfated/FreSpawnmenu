@@ -893,7 +893,7 @@ hook.Add( 'PopulateToolMenu', 'FreSpawnMenuTool', function()
 
 		local SkinChanger = vgui.Create( 'DComboBox', panel )
 		SkinChanger:Dock( TOP )
-		SkinChanger:DockMargin( 0, 8, 0, 0 )
+		SkinChanger:DockMargin( 10, 8, 10, 0 )
 		SkinChanger:SetValue( frespawnmenu_derma_skin:GetString() )
 		SkinChanger.OnSelect = function( self, index, value, data )
 			RunConsoleCommand( 'frespawnmenu_derma_skin', data )
