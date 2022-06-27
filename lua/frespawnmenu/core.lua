@@ -897,10 +897,7 @@ hook.Add( 'PopulateToolMenu', 'FreSpawnMenuTool', function()
 		SkinChanger:SetValue( frespawnmenu_derma_skin:GetString() )
 		SkinChanger.OnSelect = function( self, index, value, data )
 			RunConsoleCommand( 'frespawnmenu_derma_skin', data )
-
-			if ( IsValid( FreSpawnMenu ) ) then
-				FreSpawnMenu:Remove()
-			end
+			RunConsoleCommand( 'frespawnmenu_rebuild' )
 		end
 
 		for skin, skindata in pairs( derma.SkinList ) do
