@@ -281,6 +281,8 @@ local function openFreMenu()
 			for name_tab, elem in SortedPairsByMemberValue( spawnmenu_tabs, 'Order' ) do
 				if ( table.HasValue( data_tabs.notvisible, name_tab ) ) then
 					DM:AddOption( name_tab, function()
+						soundPlay()
+
 						for k, tab in pairs( data_tabs.notvisible ) do
 							if ( tab == name_tab ) then
 								table.remove( data_tabs.notvisible, k )
