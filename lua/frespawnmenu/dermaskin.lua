@@ -12,7 +12,7 @@ local function Blur( panel )
 	if ( !GetConVar( 'frespawnmenu_blur' ):GetBool() or GetConVar( 'frespawnmenu_frame' ):GetBool() and IsValid( FreSpawnMenu.lblTitle ) ) then
 		return
 	end
- 
+
 	local x, y = panel:LocalToScreen( 0, 0 )
 
 	surface.SetDrawColor( color_white )

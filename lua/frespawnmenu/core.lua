@@ -11,6 +11,7 @@ local frespawnmenu_custom_sound = CreateClientConVar( 'frespawnmenu_custom_sound
 local frespawnmenu_simple_tabs = CreateClientConVar( 'frespawnmenu_simple_tabs', 0, true )
 local frespawnmenu_derma_skin = CreateClientConVar( 'frespawnmenu_derma_skin', 'fsm', true )
 local frespawnmenu_tool_drawer = CreateClientConVar( 'frespawnmenu_tool_drawer', 0, true )
+local frespawnmenu_fav_startup = CreateClientConVar( 'frespawnmenu_fav_startup', 0, true )
 
 CreateClientConVar( 'frespawnmenu_blur', 1, true )
 CreateClientConVar( 'frespawnmenu_frame', 0, true )
@@ -639,6 +640,24 @@ local function openFreMenu()
 		end
 	end
 
+	local function FavToolsCreate()
+		local favorites_tool = util.JSONToTable( file.Read( 'frespawnmenu_fav_tools.json', 'DATA' ) or '[]' )
+
+		local Favorite_Category = vgui.Create( 'DCollapsibleCategory', tool_sp )
+		Favorite_Category:Dock( TOP )
+		Favorite_Category:SetLabel( '#frespawnmenu.favourites' )
+
+		for category_tab_id, tools_tab in ipairs( spawnmenu_tools ) do
+			for category_num, category in pairs( tools_tab.Items ) do
+				for tool_num, tool in pairs( category ) do
+					if ( table.HasValue( favorites_tool, tool.ItemName ) ) then
+						ToolAction( tool, favorites_tool, Favorite_Category, { category_tab_id, category_num, tool_num } )
+					end
+				end
+			end
+		end
+	end
+
 	tool_CategoryButton.DoClick = function()
 		local DM = DermaMenu()
 		DM:SetSkin( menu_skin )
@@ -663,19 +682,7 @@ local function openFreMenu()
 
 				tool_sp:Clear()
 
-				local Favorite_Category = vgui.Create( 'DCollapsibleCategory', tool_sp )
-				Favorite_Category:Dock( TOP )
-				Favorite_Category:SetLabel( '#frespawnmenu.favourites' )
-
-				for category_tab_id, tools_tab in ipairs( spawnmenu_tools ) do
-					for category_num, category in pairs( tools_tab.Items ) do
-						for tool_num, tool in pairs( category ) do
-							if ( table.HasValue( favorites_tool, tool.ItemName ) ) then
-								ToolAction( tool, favorites_tool, Favorite_Category, { category_tab_id, category_num, tool_num } )
-							end
-						end
-					end
-				end
+				FavToolsCreate()
 			end )
 			fav_option.Paint = nil
 			fav_option:SetIcon( 'icon16/star.png' )
@@ -722,6 +729,7 @@ local function openFreMenu()
 		CreateDrawerCheckBox( '#frespawnmenu.tool.tool_right', 'frespawnmenu_tool_right' )
 		CreateDrawerCheckBox( '#frespawnmenu.tool.scrollbar_tools', 'frespawnmenu_scrollbar_tools' )
 		CreateDrawerCheckBox( 'Tool Drawer', 'frespawnmenu_tool_drawer' )
+		CreateDrawerCheckBox( '#frespawnmenu.tool.fav_startup', 'frespawnmenu_fav_startup' )
 	end
 
 	// Setting standard settings when opening for the first time
@@ -731,7 +739,12 @@ local function openFreMenu()
 	local active_tool_category = active_category.Items[ save_tool_data[ 2 ] ] or active_category.Items[ 1 ]
 	local active_tool = active_tool_category[ save_tool_data[ 3 ] ] or active_tool_category[ 1 ]
 
-	tools_create( active_category, save_tool_data[ 1 ] )
+	if ( frespawnmenu_fav_startup:GetBool() ) then
+		FavToolsCreate()
+	else
+		tools_create( active_category, save_tool_data[ 1 ] )
+	end
+
 	create_tool( active_tool )
 
 	if ( !frespawnmenu_simple_tabs:GetBool() ) then
@@ -867,6 +880,7 @@ hook.Add( 'PopulateToolMenu', 'FreSpawnMenuTool', function()
 			panel:AddControl( 'CheckBox', { Label = '#frespawnmenu.tool.tool_right', Command = 'frespawnmenu_tool_right' } )
 			panel:AddControl( 'CheckBox', { Label = '#frespawnmenu.tool.scrollbar_tools', Command = 'frespawnmenu_scrollbar_tools' } )
 			panel:AddControl( 'CheckBox', { Label = 'Tool Drawer', Command = 'frespawnmenu_tool_drawer' } )
+			panel:AddControl( 'CheckBox', { Label = '#frespawnmenu.tool.fav_startup', Command = 'frespawnmenu_fav_startup' } )
 		end
 
 		panel:AddControl( 'Header', { Description = 'Derma Skin:' } )
