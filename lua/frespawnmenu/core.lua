@@ -884,7 +884,7 @@ hook.Add( 'PopulateToolMenu', 'FreSpawnMenuTool', function()
 		panel:AddControl( 'CheckBox', { Label = '#frespawnmenu.tool.window', Command = 'frespawnmenu_frame' } )
 
 		if ( frespawnmenu_frame:GetBool() ) then
-			panel:AddControl( 'CheckBox', { Label = '#frespawnmenu.tool.window_blur', Command = 'frespawnmenu_frame_blur' } )
+			panel:AddControl( 'CheckBox', { Label = '#frespawnmenu.tool.frame_blur', Command = 'frespawnmenu_frame_blur' } )
 		end
 
 		panel:AddControl( 'CheckBox', { Label = '#frespawnmenu.tool.menubar', Command = 'frespawnmenu_menubar' } )
