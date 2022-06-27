@@ -53,7 +53,7 @@ local function openFreMenu()
 	local spawnmenu_tabs = spawnmenu.GetCreationTabs()
 	local spawnmenu_tools = spawnmenu.GetTools()
 	local menu_skin = frespawnmenu_derma_skin:GetString()
-	local data_tabs = util.JSONToTable( file.Read( 'frespawnmenu_tabs.txt', 'DATA' ) or '[]' )
+	local data_tabs = util.JSONToTable( file.Read( 'frespawnmenu_tabs.txt', 'DATA' ) )
 
 	local function spawnmenu_set_standart_size()
 		FreSpawnMenu:SetSize( spawn_w, math.min( scrh - 10, scrh * 0.95 ) * frespawnmenu_size:GetFloat() )
@@ -293,7 +293,7 @@ local function openFreMenu()
 		end
 
 		local tab_num = 0
-		local data_tabs = util.JSONToTable( file.Read( 'frespawnmenu_tabs.txt', 'DATA' ) or '[]' )
+		local data_tabs = util.JSONToTable( file.Read( 'frespawnmenu_tabs.txt', 'DATA' ) )
 
 		for name, tab in SortedPairsByMemberValue( spawnmenu_tabs, 'Order' ) do
 			tab_num = tab_num + 1
