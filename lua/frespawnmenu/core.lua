@@ -10,6 +10,7 @@ local frespawnmenu_scrollbar_tools = CreateClientConVar( 'frespawnmenu_scrollbar
 local frespawnmenu_custom_sound = CreateClientConVar( 'frespawnmenu_custom_sound', 1, true )
 local frespawnmenu_simple_tabs = CreateClientConVar( 'frespawnmenu_simple_tabs', 0, true )
 local frespawnmenu_derma_skin = CreateClientConVar( 'frespawnmenu_derma_skin', 'fsm', true )
+local frespawnmenu_tool_drawer = CreateClientConVar( 'frespawnmenu_tool_drawer', 0, true )
 
 CreateClientConVar( 'frespawnmenu_blur', 1, true )
 CreateClientConVar( 'frespawnmenu_frame', 0, true )
@@ -97,7 +98,7 @@ local function openFreMenu()
 
 		self.m_bHangOpen = true
 	end
-	
+
 	function FreSpawnMenu:EndKeyFocus( pPanel )
 		if ( self.m_pKeyFocus != pPanel ) then
 			return
@@ -122,7 +123,7 @@ local function openFreMenu()
 
 	if ( frespawnmenu_tool_right:GetBool() ) then
 		global_div:SetLeft( MainPanel )
-		global_div:SetLeftWidth( spawn_w - 160 ) 
+		global_div:SetLeftWidth( spawn_w - 160 )
 		global_div:SetLeftMin( spawn_w * 0.8 )
 		global_div:SetRight( ToolPanel )
 		global_div:SetRightMin( 120 )
@@ -229,7 +230,7 @@ local function openFreMenu()
 								soundPlay()
 
 								Derma_StringRequest(
-									'FreSpawnMenu', 
+									'FreSpawnMenu',
 									'An empty field is equal to the standard name',
 									data_tabs.renamed[ name_tab ] and data_tabs.renamed[ name_tab ] or '',
 									function( text )
@@ -248,7 +249,7 @@ local function openFreMenu()
 
 							ChildOption:AddOption( "Not display", function()
 								soundPlay()
-								
+
 								if ( table.HasValue( data_tabs.notvisible, name_tab ) ) then
 									for k, tab in pairs( data_tabs.notvisible ) do
 										if ( tab == name_tab ) then
@@ -298,7 +299,7 @@ local function openFreMenu()
 			tab.num = tab_num
 
 			if ( data_tabs.renamed[ name ] ) then
-				name = data_tabs.renamed[ name ]   
+				name = data_tabs.renamed[ name ]
 			end
 
 			local Tab = {}
@@ -410,9 +411,9 @@ local function openFreMenu()
 			DM:SetDrawColumn( true )
 			DM:Hide()
 			DM:SetSkin( menu_skin )
-	
+
 			self.Menus[ label ] = DM
-		
+
 			local b = self:Add( 'DButton' )
 			b:SetText( label )
 			b:Dock( LEFT )
@@ -423,31 +424,31 @@ local function openFreMenu()
 			b.DoClick = function()
 				if ( DM:IsVisible() ) then
 					DM:Hide()
-	
+
 					return
 				end
-	
+
 				local x, y = b:LocalToScreen( 0, 0 )
-	
+
 				DM:Open( x, y + b:GetTall(), false, b )
 			end
 			b.OnCursorEntered = function()
 				local opened = self:GetOpenMenu()
-	
+
 				if ( !IsValid( opened ) or opened == DM ) then
 					return
 				end
-	
+
 				opened:Hide()
-				
+
 				b:DoClick()
 			end
-			
+
 			panel_menubar.user_wide = panel_menubar.user_wide + b:GetWide() + 5
-		
+
 			return DM
 		end
-	
+
 		hook.Run( 'PopulateMenuBar', mb )
 
 		if ( !frespawnmenu_simple_tabs:GetBool() ) then
@@ -591,7 +592,7 @@ local function openFreMenu()
 
 			local DM = DermaMenu()
 			DM:SetSkin( menu_skin )
-			
+
 			if ( not tool_btn.fav ) then
 				local fav = DM:AddOption( '#frespawnmenu.fav_add', function()
 					soundPlay( 'garrysmod/content_downloaded.wav' )
@@ -615,7 +616,7 @@ local function openFreMenu()
 					tool_btn.fav = false
 				end )
 				remove_fav.Paint = nil
-				remove_fav:SetIcon( 'icon16/cross.png' )	
+				remove_fav:SetIcon( 'icon16/cross.png' )
 			end
 
 			DM:Open()
@@ -661,7 +662,7 @@ local function openFreMenu()
 				soundPlay()
 
 				tool_sp:Clear()
-				
+
 				local Favorite_Category = vgui.Create( 'DCollapsibleCategory', tool_sp )
 				Favorite_Category:Dock( TOP )
 				Favorite_Category:SetLabel( '#frespawnmenu.favourites' )
@@ -681,6 +682,46 @@ local function openFreMenu()
 		end
 
 		DM:Open()
+	end
+
+	if ( frespawnmenu_tool_drawer:GetBool() ) then
+		local ToolDrawer = vgui.Create( 'DDrawer', ToolPanel )
+		ToolDrawer:SetOpenTime( 0.2 )
+		ToolDrawer.ToggleButton:SetText( '' )
+
+		local DrawerPanel = vgui.Create( 'DPanel', ToolDrawer )
+		DrawerPanel:Dock( FILL )
+
+		local DrawerSP = vgui.Create( 'DScrollPanel', DrawerPanel )
+		DrawerSP:Dock( FILL )
+		DrawerSP:DockMargin( 6, 12, 6, 6 )
+		DrawerSP:GetVBar():SetWide( 0 )
+		DrawerSP.num = 0
+
+		local function CreateDrawerCheckBox( title, cvar )
+			local DrawerCheckbox = vgui.Create( 'DCheckBoxLabel', DrawerSP )
+			DrawerCheckbox:Dock( TOP )
+
+			if ( DrawerSP.num > 0 ) then
+				DrawerCheckbox:DockMargin( 0, 8, 0, 0 )
+			end
+
+			DrawerCheckbox:SetText( title )
+			DrawerCheckbox:SetTooltip( title )
+			DrawerCheckbox:SetChecked( GetConVar( cvar ):GetBool() )
+			DrawerCheckbox:SetDark( true )
+
+			function DrawerCheckbox:OnChange( val )
+				RunConsoleCommand( cvar, DrawerCheckbox:GetChecked() and '1' or '0' )
+				RunConsoleCommand( 'frespawnmenu_rebuild' )
+			end
+
+			DrawerSP.num = DrawerSP.num + 1
+		end
+
+		CreateDrawerCheckBox( '#frespawnmenu.tool.tool_right', 'frespawnmenu_tool_right' )
+		CreateDrawerCheckBox( '#frespawnmenu.tool.scrollbar_tools', 'frespawnmenu_scrollbar_tools' )
+		CreateDrawerCheckBox( 'Tool Drawer', 'frespawnmenu_tool_drawer' )
 	end
 
 	// Setting standard settings when opening for the first time
@@ -759,7 +800,7 @@ hook.Add( 'OnSpawnMenuClose', 'FreSpawnMenuClose', function()
 			if ( FreSpawnMenu.m_bHangOpen ) then
 
 				FreSpawnMenu.m_bHangOpen = false
-		
+
 				return
 			end
 
@@ -815,17 +856,21 @@ hook.Add( 'PopulateToolMenu', 'FreSpawnMenuTool', function()
 
 		panel:AddControl( 'Button', { Label = '#frespawnmenu.tool.rebuild', Command = 'frespawnmenu_rebuild' } )
 
-        panel:AddControl( 'Header', { Description = '#frespawnmenu.tool.rebuild_info' } )
-		panel:AddControl( 'CheckBox', { Label = '#frespawnmenu.tool.tool_right', Command = 'frespawnmenu_tool_right' } )
+		panel:AddControl( 'Header', { Description = '#frespawnmenu.tool.rebuild_info' } )
 		panel:AddControl( 'CheckBox', { Label = '#frespawnmenu.tool.window', Command = 'frespawnmenu_frame' } )
 		panel:AddControl( 'CheckBox', { Label = '#frespawnmenu.tool.menubar', Command = 'frespawnmenu_menubar' } )
 		panel:AddControl( 'Slider', { Label = '#frespawnmenu.tool.size', Command = 'frespawnmenu_size', Min = 0.5, Max = 1.05, Type = 'float' } )
 		panel:AddControl( 'CheckBox', { Label = '#frespawnmenu.tool.tab_icon', Command = 'frespawnmenu_tab_icon' } )
-		panel:AddControl( 'CheckBox', { Label = '#frespawnmenu.tool.scrollbar_tools', Command = 'frespawnmenu_scrollbar_tools' } )
 		panel:AddControl( 'CheckBox', { Label = '#frespawnmenu.tool.simple_tabs', Command = 'frespawnmenu_simple_tabs' } )
 
+		if ( !frespawnmenu_tool_drawer:GetBool() ) then
+			panel:AddControl( 'CheckBox', { Label = '#frespawnmenu.tool.tool_right', Command = 'frespawnmenu_tool_right' } )
+			panel:AddControl( 'CheckBox', { Label = '#frespawnmenu.tool.scrollbar_tools', Command = 'frespawnmenu_scrollbar_tools' } )
+			panel:AddControl( 'CheckBox', { Label = 'Tool Drawer', Command = 'frespawnmenu_tool_drawer' } )
+		end
+
 		panel:AddControl( 'Header', { Description = 'Derma Skin:' } )
-		
+
 		local SkinChanger = vgui.Create( 'DComboBox', panel )
 		SkinChanger:Dock( TOP )
 		SkinChanger:DockMargin( 0, 8, 0, 0 )
