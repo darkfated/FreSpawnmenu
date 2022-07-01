@@ -13,6 +13,7 @@ local frespawnmenu_derma_skin = CreateClientConVar( 'frespawnmenu_derma_skin', '
 local frespawnmenu_tool_drawer = CreateClientConVar( 'frespawnmenu_tool_drawer', 0, true )
 local frespawnmenu_fav_startup = CreateClientConVar( 'frespawnmenu_fav_startup', 0, true )
 local frespawnmenu_frame = CreateClientConVar( 'frespawnmenu_frame', 0, true )
+local frespawnmenu_quick_category_buttons = CreateClientConVar( 'frespawnmenu_quick_category_buttons', 0, true )
 
 CreateClientConVar( 'frespawnmenu_blur', 1, true )
 CreateClientConVar( 'frespawnmenu_adaptive_wide_nav', 1, true )
@@ -516,10 +517,14 @@ local function openFreMenu()
 		tool_sp:GetVBar():SetWide( 0 )
 	end
 
-	local tool_CategoryButton = vgui.Create( 'DButton', ToolPanel )
-	tool_CategoryButton:Dock( TOP )
-	tool_CategoryButton:DockMargin( 4, 4, 4, -2 )
-	tool_CategoryButton:SetTall( 18 )
+	local tool_CategoryPanel = vgui.Create( 'DPanel', ToolPanel )
+	tool_CategoryPanel:Dock( TOP )
+	tool_CategoryPanel:DockMargin( 4, 4, 4, -2 )
+	tool_CategoryPanel:SetTall( 18 )
+	tool_CategoryPanel.Paint = nil
+
+	local tool_CategoryButton = vgui.Create( 'DButton', tool_CategoryPanel )
+	tool_CategoryButton:Dock( FILL )
 	tool_CategoryButton:SetText( '#frespawnmenu.categories' )
 
 	local tool_cp_sp_panel = vgui.Create( 'DPanel', action_panel_div )
@@ -741,13 +746,70 @@ local function openFreMenu()
 		CreateDrawerCheckBox( '#frespawnmenu.tool.scrollbar_tools', 'frespawnmenu_scrollbar_tools' )
 		CreateDrawerCheckBox( 'Tool Drawer', 'frespawnmenu_tool_drawer' )
 		CreateDrawerCheckBox( '#frespawnmenu.tool.fav_startup', 'frespawnmenu_fav_startup' )
+		CreateDrawerCheckBox( '#frespawnmenu.tool.quick_category_buttons', 'frespawnmenu_quick_category_buttons' )
 
 		ToolDrawer:SetOpenSize( ToolDrawer.tall )
 	end
 
+	local save_tool_data = util.JSONToTable( frespawnmenu_save_tool:GetString() )
+
+	tool_CategoryPanel.category_nav = save_tool_data[ 1 ]
+
+	if ( frespawnmenu_quick_category_buttons:GetBool() ) then
+		local save_tool_data = util.JSONToTable( frespawnmenu_save_tool:GetString() )
+
+		local tool_NavigationPanel = vgui.Create( 'DPanel', tool_CategoryPanel )
+		tool_NavigationPanel:Dock( RIGHT )
+		tool_NavigationPanel:DockMargin( 2, 0, 0, 0 )
+		tool_NavigationPanel:SetWide( 38 )
+		tool_NavigationPanel.Paint = nil
+
+		local tool_PrevButton = vgui.Create( 'DButton', tool_NavigationPanel )
+		tool_PrevButton:Dock( LEFT )
+		tool_PrevButton:SetWide( 18 )
+		tool_PrevButton:SetText( '' )
+
+		local tool_NextButton = vgui.Create( 'DButton', tool_NavigationPanel )
+		tool_NextButton:Dock( RIGHT )
+		tool_NextButton:SetWide( 18 )
+		tool_NextButton:SetText( '' )
+
+		tool_PrevButton.DoClick = function()
+			tool_CategoryPanel.category_nav = tool_CategoryPanel.category_nav - 1
+
+			if ( tool_CategoryPanel.category_nav < 1 ) then
+				tool_CategoryPanel.category_nav = 1
+			else
+				soundPlay()
+
+				tool_PrevButton.nav_icon = Material( spawnmenu_tools[ tool_CategoryPanel.category_nav - 1 < 1 and 1 or tool_CategoryPanel.category_nav - 1 ].Icon )
+				tool_NextButton.nav_icon = Material( spawnmenu_tools[ tool_CategoryPanel.category_nav + 1 ].Icon )
+
+				tools_create( spawnmenu_tools[ tool_CategoryPanel.category_nav ], tool_CategoryPanel.category_nav )
+			end
+		end
+
+		tool_NextButton.DoClick = function()
+			tool_CategoryPanel.category_nav = tool_CategoryPanel.category_nav + 1
+
+			if ( tool_CategoryPanel.category_nav > #spawnmenu_tools ) then
+				tool_CategoryPanel.category_nav = #spawnmenu_tools
+			else
+				soundPlay()
+
+				tool_PrevButton.nav_icon = Material( spawnmenu_tools[ tool_CategoryPanel.category_nav - 1 ].Icon )
+				tool_NextButton.nav_icon = Material( spawnmenu_tools[ tool_CategoryPanel.category_nav + 1 > #spawnmenu_tools and #spawnmenu_tools or tool_CategoryPanel.category_nav + 1 ].Icon )
+
+				tools_create( spawnmenu_tools[ tool_CategoryPanel.category_nav ], tool_CategoryPanel.category_nav )
+			end
+		end
+
+		tool_PrevButton.nav_icon = Material( spawnmenu_tools[ tool_CategoryPanel.category_nav - 1 < 1 and 1 or tool_CategoryPanel.category_nav - 1 ].Icon )
+		tool_NextButton.nav_icon = Material( spawnmenu_tools[ tool_CategoryPanel.category_nav + 1 > #spawnmenu_tools and #spawnmenu_tools or tool_CategoryPanel.category_nav + 1 ].Icon )
+	end
+
 	// Setting standard settings when opening for the first time
 
-	local save_tool_data = util.JSONToTable( frespawnmenu_save_tool:GetString() )
 	local active_category = spawnmenu_tools[ save_tool_data[ 1 ] ] or spawnmenu_tools[ 1 ]
 	local active_tool_category = active_category.Items[ save_tool_data[ 2 ] ] or active_category.Items[ 1 ]
 	local active_tool = active_tool_category[ save_tool_data[ 3 ] ] or active_tool_category[ 1 ]
@@ -899,6 +961,7 @@ hook.Add( 'PopulateToolMenu', 'FreSpawnMenuTool', function()
 			panel:AddControl( 'CheckBox', { Label = '#frespawnmenu.tool.scrollbar_tools', Command = 'frespawnmenu_scrollbar_tools' } )
 			panel:AddControl( 'CheckBox', { Label = 'Tool Drawer', Command = 'frespawnmenu_tool_drawer' } )
 			panel:AddControl( 'CheckBox', { Label = '#frespawnmenu.tool.fav_startup', Command = 'frespawnmenu_fav_startup' } )
+			panel:AddControl( 'CheckBox', { Label = '#frespawnmenu.tool.quick_category_buttons', Command = 'frespawnmenu_quick_category_buttons' } )
 		end
 
 		panel:AddControl( 'Header', { Description = 'Derma Skin:' } )

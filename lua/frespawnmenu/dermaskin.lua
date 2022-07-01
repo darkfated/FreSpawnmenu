@@ -6,6 +6,7 @@ local color_gray = Color(70,70,70,200)
 local color_blue = Color(47,96,255)
 local color_button = Color(226,226,226)
 local color_bluepurpl = Color(113,44,250)
+local color_icon_depressed = Color(230,230,230)
 local scrw, scrh = ScrW(), ScrH()
 
 local function Blur( panel )
@@ -323,6 +324,14 @@ end
 -----------------------------------------------------------]]
 function SKIN:PaintButton( panel, w, h )
 	if ( !panel.m_bBackground ) then return end
+
+	if ( panel.nav_icon ) then
+		surface.SetDrawColor( panel.Depressed and color_icon_depressed or color_white )
+		surface.SetMaterial( panel.nav_icon )
+		surface.DrawTexturedRect( 1, 1, w - 2, h - 2 )
+
+		return
+	end
 
 	ButtonPaint( panel, w, h, panel.id, panel.fav )
 end
