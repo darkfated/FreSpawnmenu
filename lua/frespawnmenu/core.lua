@@ -670,7 +670,7 @@ local function openFreMenu()
 		end
 	end
 
-	tool_CategoryButton.DoClick = function()
+	local function OpenCategoriesDM()
 		local DM = DermaMenu()
 		DM:SetSkin( menu_skin )
 
@@ -701,6 +701,13 @@ local function openFreMenu()
 		end
 
 		DM:Open()
+	end
+
+	tool_CategoryButton.DoClick = function()
+		OpenCategoriesDM()
+	end
+	tool_CategoryButton.DoRightClick = function()
+		OpenCategoriesDM()
 	end
 
 	if ( frespawnmenu_tool_drawer:GetBool() ) then
@@ -806,6 +813,13 @@ local function openFreMenu()
 
 		tool_PrevButton.nav_icon = Material( spawnmenu_tools[ tool_CategoryPanel.category_nav - 1 < 1 and 1 or tool_CategoryPanel.category_nav - 1 ].Icon )
 		tool_NextButton.nav_icon = Material( spawnmenu_tools[ tool_CategoryPanel.category_nav + 1 > #spawnmenu_tools and #spawnmenu_tools or tool_CategoryPanel.category_nav + 1 ].Icon )
+
+		tool_PrevButton.DoRightClick = function()
+			OpenCategoriesDM()
+		end
+		tool_NextButton.DoRightClick = function()
+			OpenCategoriesDM()
+		end
 	end
 
 	// Setting standard settings when opening for the first time
