@@ -670,6 +670,14 @@ local function openFreMenu()
 		end
 	end
 
+	local function ClickToCreateFavTools()
+		soundPlay()
+
+		tool_sp:Clear()
+
+		FavToolsCreate()
+	end
+
 	local function OpenCategoriesDM()
 		local DM = DermaMenu()
 		DM:SetSkin( menu_skin )
@@ -690,11 +698,7 @@ local function openFreMenu()
 
 		if ( table.Count( favorites_tool ) != 0 ) then
 			local fav_option = DM:AddOption( '#frespawnmenu.favourites', function()
-				soundPlay()
-
-				tool_sp:Clear()
-
-				FavToolsCreate()
+				ClickToCreateFavTools()
 			end )
 			fav_option.Paint = nil
 			fav_option:SetIcon( 'icon16/star.png' )
@@ -708,6 +712,9 @@ local function openFreMenu()
 	end
 	tool_CategoryButton.DoRightClick = function()
 		OpenCategoriesDM()
+	end
+	tool_CategoryButton.DoMiddleClick = function()
+		ClickToCreateFavTools()
 	end
 
 	if ( frespawnmenu_tool_drawer:GetBool() ) then
