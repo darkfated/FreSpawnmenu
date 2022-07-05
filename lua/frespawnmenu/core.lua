@@ -214,6 +214,47 @@ local function openFreMenu()
 			TabTable.Panel:SetVisible( true )
 		end
 
+		local function TabEditionOptions( panel, name_tab )
+			panel:AddOption( '#frespawnmenu.rename', function()
+				soundPlay()
+
+				Derma_StringRequest(
+					'FreSpawnMenu',
+					'#frespawnmenu.rename_description',
+					data_tabs.renamed[ name_tab ] and data_tabs.renamed[ name_tab ] or '',
+					function( text )
+						if ( text != '' ) then
+							data_tabs.renamed[ name_tab ] = text
+						else
+							table.RemoveByValue( data_tabs.renamed, data_tabs.renamed[ name_tab ] )
+						end
+
+						file.Write( 'frespawnmenu_tabs.txt', util.TableToJSON( data_tabs ) )
+
+						FreSpawnMenu:Remove()
+					end
+				):SetSkin( menu_skin )
+			end ):SetIcon( 'icon16/book_edit.png' )
+
+			panel:AddOption( '#frespawnmenu.not_display', function()
+				soundPlay()
+
+				if ( table.HasValue( data_tabs.notvisible, name_tab ) ) then
+					for k, tab in pairs( data_tabs.notvisible ) do
+						if ( tab == name_tab ) then
+							table.remove( data_tabs.notvisible, k )
+						end
+					end
+				else
+					table.insert( data_tabs.notvisible, name_tab )
+				end
+
+				file.Write( 'frespawnmenu_tabs.txt', util.TableToJSON( data_tabs ) )
+
+				FreSpawnMenu:Remove()
+			end ):SetIcon( 'icon16/camera.png' )
+		end
+
 		local function OpenTabsDermaMenu()
 			local DM = DermaMenu()
 			DM:SetSkin( menu_skin )
@@ -233,44 +274,7 @@ local function openFreMenu()
 							ParentOption.right_clicked = true
 							ParentOption.ArrowActive = true
 
-							ChildOption:AddOption( '#frespawnmenu.rename', function()
-								soundPlay()
-
-								Derma_StringRequest(
-									'FreSpawnMenu',
-									'#frespawnmenu.rename_description',
-									data_tabs.renamed[ name_tab ] and data_tabs.renamed[ name_tab ] or '',
-									function( text )
-										if ( text != '' ) then
-											data_tabs.renamed[ name_tab ] = text
-										else
-											table.RemoveByValue( data_tabs.renamed, data_tabs.renamed[ name_tab ] )
-										end
-
-										file.Write( 'frespawnmenu_tabs.txt', util.TableToJSON( data_tabs ) )
-
-										FreSpawnMenu:Remove()
-									end
-								):SetSkin( menu_skin )
-							end ):SetIcon( 'icon16/book_edit.png' )
-
-							ChildOption:AddOption( '#frespawnmenu.not_display', function()
-								soundPlay()
-
-								if ( table.HasValue( data_tabs.notvisible, name_tab ) ) then
-									for k, tab in pairs( data_tabs.notvisible ) do
-										if ( tab == name_tab ) then
-											table.remove( data_tabs.notvisible, k )
-										end
-									end
-								else
-									table.insert( data_tabs.notvisible, name_tab )
-								end
-
-								file.Write( 'frespawnmenu_tabs.txt', util.TableToJSON( data_tabs ) )
-
-								FreSpawnMenu:Remove()
-							end ):SetIcon( 'icon16/camera.png' )
+							TabEditionOptions( ChildOption, name_tab )
 						end
 					end
 					ParentOption.ArrowActive = false
@@ -343,6 +347,14 @@ local function openFreMenu()
 				end
 				btn_item.DoRightClick = function()
 					OpenTabsDermaMenu()
+				end
+				btn_item.DoMiddleClick = function()
+					local DM = DermaMenu()
+					DM:SetSkin( menu_skin )
+
+					TabEditionOptions( DM, name )
+
+					DM:Open()
 				end
 				btn_item.id = name
 
@@ -1001,3 +1013,4 @@ hook.Add( 'PopulateToolMenu', 'FreSpawnMenuTool', function()
 		end
 	end )
 end )
+ 
