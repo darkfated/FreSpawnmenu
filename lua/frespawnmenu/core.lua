@@ -338,6 +338,23 @@ local function openFreMenu()
 			if ( !table.HasValue( data_tabs.notvisible, name ) ) then
 				local size_name = surface.GetTextSize( name )
 
+				local function TabClick( pnl )
+					pnl.DoClick = function()
+						OpenContent( tab.num )
+					end
+					pnl.DoRightClick = function()
+						OpenTabsDermaMenu()
+					end
+					pnl.DoMiddleClick = function()
+						local DM = DermaMenu()
+						DM:SetSkin( menu_skin )
+
+						TabEditionOptions( DM, name )
+
+						DM:Open()
+					end
+				end
+
 				local btn_item = vgui.Create( 'DButton', tab_panel_sp )
 
 				local btn_item_wide = size_name + 10 + btn_item:GetTall()
@@ -347,20 +364,8 @@ local function openFreMenu()
 
 				tabs_panel.user_wide = tabs_panel.user_wide + btn_item_wide + 4
 
-				btn_item.DoClick = function()
-					OpenContent( tab.num )
-				end
-				btn_item.DoRightClick = function()
-					OpenTabsDermaMenu()
-				end
-				btn_item.DoMiddleClick = function()
-					local DM = DermaMenu()
-					DM:SetSkin( menu_skin )
+				TabClick( btn_item )
 
-					TabEditionOptions( DM, name )
-
-					DM:Open()
-				end
 				btn_item.id = name
 
 				btn_item.PaintOver = function()
@@ -395,12 +400,8 @@ local function openFreMenu()
 						surface.SetMaterial( IconMat )
 						surface.DrawTexturedRect( 4, h * 0.5 - 8, w - 8, 16 )
 					end
-					icon_pan.DoClick = function()
-						OpenContent( tab.num )
-					end
-					icon_pan.DoRightClick = function()
-						OpenTabsDermaMenu()
-					end
+
+					TabClick( icon_pan )
 
 					tab_panel_sp:AddPanel( icon_pan )
 				end
