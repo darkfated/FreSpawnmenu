@@ -863,6 +863,10 @@ local function openFreMenu()
 
 	if ( !frespawnmenu_simple_tabs:GetBool() ) then
 		for k, tab in pairs( FreSpawnMenu.Tabs ) do
+			if ( data_tabs.renamed[ tab.Title ] ) then
+				tab.Title = data_tabs.renamed[ tab.Title ]
+			end
+
 			if ( tab.Title == frespawnmenu_content:GetString() ) then
 				FreSpawnMenu.Tabs[ k ].Panel:SetVisible( true )
 			end
