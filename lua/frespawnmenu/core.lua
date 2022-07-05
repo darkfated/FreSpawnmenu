@@ -418,6 +418,14 @@ local function openFreMenu()
 			freOutlinedBox( 0, 0, w, h, color_white, color_gray )
 		end
 
+		PanelEnd.btn = vgui.Create( 'DButton', PanelEnd )
+		PanelEnd.btn:Dock( FILL )
+		PanelEnd.btn:SetText( '' )
+		PanelEnd.btn.Paint = nil
+		PanelEnd.btn.DoClick = function()
+			OpenTabsDermaMenu()
+		end
+
 		tab_panel_sp:AddPanel( PanelEnd )
 	end
 
