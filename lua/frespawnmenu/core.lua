@@ -618,8 +618,6 @@ local function openFreMenu()
 			end
 		end
 		tool_btn.DoRightClick = function()
-			soundPlay()
-
 			local DM = DermaMenu()
 			DM:SetSkin( menu_skin )
 
