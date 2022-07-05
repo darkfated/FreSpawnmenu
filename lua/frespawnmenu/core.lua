@@ -245,11 +245,7 @@ local function openFreMenu()
 				soundPlay()
 
 				if ( table.HasValue( data_tabs.notvisible, name_tab ) ) then
-					for k, tab in pairs( data_tabs.notvisible ) do
-						if ( tab == name_tab ) then
-							table.remove( data_tabs.notvisible, k )
-						end
-					end
+					table.remove( data_tabs.notvisible, k )
 				else
 					table.insert( data_tabs.notvisible, name_tab )
 				end
@@ -266,7 +262,6 @@ local function openFreMenu()
 
 			for name_tab, elem in SortedPairsByMemberValue( spawnmenu_tabs, 'Order' ) do
 				if ( !table.HasValue( data_tabs.notvisible, name_tab ) ) then
-
 					local ChildOption, ParentOption = DM:AddSubMenu( data_tabs.renamed[ name_tab ] and data_tabs.renamed[ name_tab ] or name_tab, function()
 						OpenContent( elem.num )
 					end )
@@ -310,7 +305,6 @@ local function openFreMenu()
 		end
 
 		local tab_num = 0
-		local data_tabs = util.JSONToTable( file.Read( 'frespawnmenu_tabs.txt', 'DATA' ) )
 
 		for name, tab in SortedPairsByMemberValue( spawnmenu_tabs, 'Order' ) do
 			tab_num = tab_num + 1
@@ -890,6 +884,10 @@ local function openFreMenu()
 		for m, tab_par in pairs( tabs_list ) do
 			if ( tab_par.Name == frespawnmenu_content:GetString() ) then
 				TabsSheet:SetActiveTab( tab_par.Tab )
+			end
+
+			if ( data_tabs.renamed[ tab_par.Name ] ) then
+				tab_par.Tab:SetText( data_tabs.renamed[ tab_par.Name ] )
 			end
 		end
 	end
