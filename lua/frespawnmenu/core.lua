@@ -369,14 +369,14 @@ local function openFreMenu()
 						tabs_panel.user_wide = 0
 
 						for name, v in SortedPairsByMemberValue( spawnmenu_tabs, 'Order' ) do
-							tabs_panel.user_wide = tabs_panel.user_wide + btn_item:GetWide()
+							tabs_panel.user_wide = tabs_panel.user_wide + btn_item:GetWide() + 16
 
 							if ( frespawnmenu_tab_icon:GetBool() ) then
 								tabs_panel.user_wide = tabs_panel.user_wide + 26
 							end
 						end
 
-						tabs_panel.user_wide = tabs_panel.user_wide + 5
+						tabs_panel.user_wide = tabs_panel.user_wide - 2
 					end
 				end
 
