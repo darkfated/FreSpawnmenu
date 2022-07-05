@@ -18,6 +18,7 @@ local frespawnmenu_quick_category_buttons = CreateClientConVar( 'frespawnmenu_qu
 CreateClientConVar( 'frespawnmenu_blur', 1, true )
 CreateClientConVar( 'frespawnmenu_adaptive_wide_nav', 1, true )
 CreateClientConVar( 'frespawnmenu_frame_blur', 1, true )
+CreateClientConVar( 'frespawnmenu_sounds', 1, true )
 
 local color_white = Color(255,255,255)
 local color_gray = Color(70,70,70,200)
@@ -35,6 +36,10 @@ local function freOutlinedBox( x, y, w, h, col, bordercol )
 end
 
 local function soundPlay( snd )
+	if ( !GetConVar( 'frespawnmenu_sounds' ):GetBool() ) then
+		return
+	end
+
 	surface.PlaySound( !snd and 'UI/buttonclickrelease.wav' or snd )
 end
 
@@ -973,6 +978,7 @@ hook.Add( 'PopulateToolMenu', 'FreSpawnMenuTool', function()
 		panel:AddControl( 'CheckBox', { Label = '#frespawnmenu.tool.status', Command = 'frespawnmenu' } )
 		panel:AddControl( 'CheckBox', { Label = '#frespawnmenu.tool.blur', Command = 'frespawnmenu_blur' } )
 		panel:AddControl( 'CheckBox', { Label = '#frespawnmenu.tool.adaptive_wide_nav', Command = 'frespawnmenu_adaptive_wide_nav' } )
+		panel:AddControl( 'CheckBox', { Label = '#frespawnmenu.tool.sounds', Command = 'frespawnmenu_sounds' } )
 		panel:AddControl( 'CheckBox', { Label = '#frespawnmenu.tool.custom_sound', Command = 'frespawnmenu_custom_sound' } )
 
 		panel:AddControl( 'Button', { Label = '#frespawnmenu.tool.rebuild', Command = 'frespawnmenu_rebuild' } )
@@ -1013,4 +1019,3 @@ hook.Add( 'PopulateToolMenu', 'FreSpawnMenuTool', function()
 		end
 	end )
 end )
- 
