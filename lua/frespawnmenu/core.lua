@@ -121,6 +121,16 @@ local function openFreMenu()
 
 	FreSpawnMenu.Tabs = {}
 
+	local function HideTabs()
+		if ( FreSpawnMenu.ContextMode ) then
+			FreSpawnMenu.ContextMode = false
+		end
+
+		for k, tab in pairs( FreSpawnMenu.Tabs ) do
+			FreSpawnMenu.Tabs[ k ].Panel:SetVisible( false )
+		end
+	end
+
 	// Separation into Spawn and Tool part
 
 	local global_div = vgui.Create( 'DHorizontalDivider', FreSpawnMenu )
@@ -212,9 +222,7 @@ local function openFreMenu()
 
 			RunConsoleCommand( 'frespawnmenu_content', TabTable.Title )
 
-			for k, tab in pairs( FreSpawnMenu.Tabs ) do
-				FreSpawnMenu.Tabs[ k ].Panel:SetVisible( false )
-			end
+			HideTabs()
 
 			TabTable.Panel:SetVisible( true )
 		end
@@ -471,13 +479,19 @@ local function openFreMenu()
 
 			for k, context_item in pairs( list.Get( 'DesktopWindows' ) ) do
 				ContextMenu:AddOption( context_item.title, function()
-					action_panel_content:Clear()
+					HideTabs()
+
+					FreSpawnMenu.ContextMode = true
 
 					local ContextMenu_Window = vgui.Create( 'DPanel', action_panel_content )
 					ContextMenu_Window:SetSize( action_panel_content:GetSize() )
 					ContextMenu_Window:Dock( FILL )
 					ContextMenu_Window:SetSkin( menu_skin )
-					ContextMenu_Window.Paint = nil
+					ContextMenu_Window.Paint = function()
+						if ( !FreSpawnMenu.ContextMode ) then
+							ContextMenu_Window:Remove()
+						end
+					end
 
 					function ContextMenu_Window:SetTitle()
 					end
