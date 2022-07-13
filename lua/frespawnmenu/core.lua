@@ -131,6 +131,32 @@ local function openFreMenu()
 		end
 	end
 
+	local function SpawnMenuIconSelection( next_func, startup_icon )
+		FreSpawnMenu.IconSelection = vgui.Create( 'DFrame', FreSpawnMenu )
+		FreSpawnMenu.IconSelection:SetSize( 188, 210 )
+		FreSpawnMenu.IconSelection:Center()
+		FreSpawnMenu.IconSelection:MakePopup()
+		FreSpawnMenu.IconSelection:SetTitle( 'Icons' )
+		FreSpawnMenu.IconSelection:SetSizable( true )
+
+		local Icons = vgui.Create( 'DIconBrowser', FreSpawnMenu.IconSelection )
+		Icons:Dock( FILL )
+
+		if ( startup_icon ) then
+			Icons:SelectIcon( startup_icon )
+		end
+
+		local ConfirmButton = vgui.Create( 'DButton', FreSpawnMenu.IconSelection )
+		ConfirmButton:Dock( BOTTOM )
+		ConfirmButton:DockMargin( 0, 4, 0, 0 )
+		ConfirmButton.DoClick = function()
+			soundPlay()
+
+			next_func( Icons:GetSelectedIcon() )
+		end
+		ConfirmButton:SetText( 'Confirm' )
+	end
+
 	// Separation into Spawn and Tool part
 
 	local global_div = vgui.Create( 'DHorizontalDivider', FreSpawnMenu )
