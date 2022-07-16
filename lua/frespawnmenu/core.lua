@@ -266,14 +266,48 @@ local function openFreMenu()
 		end ):SetIcon( 'icon16/camera.png' )
 	end
 
-	local function OpenTabsDermaMenu()
+	local function OpenContent( tab_id )
+		local TabTable = FreSpawnMenu.Tabs[ tab_id ]
+
+		if ( frespawnmenu_content:GetString() == TabTable.Title ) then
+			return
+		end
+
+		soundPlay( 'buttons/lightswitch2.wav' )
+
+		RunConsoleCommand( 'frespawnmenu_content', TabTable.Title )
+
+		HideTabs()
+
+		TabTable.Panel:SetVisible( true )
+	end
+
+	local function OpenTabsDermaMenu( sheet )
 		local DM = DermaMenu()
 		DM:SetSkin( menu_skin )
 
+		local tab_num = 1
+
 		for name_tab, elem in SortedPairsByMemberValue( spawnmenu_tabs, 'Order' ) do
+			elem.num = tab_num
+
 			if ( !table.HasValue( data_tabs.notvisible, name_tab ) ) then
 				local ChildOption, ParentOption = DM:AddSubMenu( data_tabs.renamed[ name_tab ] and data_tabs.renamed[ name_tab ] or name_tab, function()
-					OpenContent( elem.num )
+					if ( sheet ) then
+						local new_tab = sheet:GetItems()[ elem.num ].Tab
+
+						if ( sheet:GetActiveTab() == new_tab ) then
+							return
+						end
+
+						soundPlay( 'buttons/lightswitch2.wav' )
+
+						RunConsoleCommand( 'frespawnmenu_content', name_tab )
+
+						sheet:SetActiveTab( new_tab )
+					else
+						OpenContent( elem.num )
+					end
 				end )
 				ParentOption:SetIcon( elem.Icon )
 				ParentOption.right_clicked = false
@@ -288,6 +322,8 @@ local function openFreMenu()
 					end
 				end
 				ParentOption.ArrowActive = false
+
+				tab_num = tab_num + 1
 			end
 		end
 
@@ -321,22 +357,6 @@ local function openFreMenu()
 		tab_panel_sp:SetOverlap( -4 )
 
 		surface.SetFont( 'Default' )
-
-		local function OpenContent( tab_id )
-			local TabTable = FreSpawnMenu.Tabs[ tab_id ]
-
-			if ( frespawnmenu_content:GetString() == TabTable.Title ) then
-				return
-			end
-
-			soundPlay( 'buttons/lightswitch2.wav' )
-
-			RunConsoleCommand( 'frespawnmenu_content', TabTable.Title )
-
-			HideTabs()
-
-			TabTable.Panel:SetVisible( true )
-		end
 
 		local tab_num = 0
 
@@ -925,7 +945,7 @@ local function openFreMenu()
 			end
 
 			tab_par.Tab.DoRightClick = function()
-				OpenTabsDermaMenu()
+				OpenTabsDermaMenu( TabsSheet )
 			end
 			tab_par.Tab.DoMiddleClick = function()
 				local DM = DermaMenu()
