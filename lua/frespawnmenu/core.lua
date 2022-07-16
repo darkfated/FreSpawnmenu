@@ -398,9 +398,9 @@ local function openFreMenu()
 
 				if ( frespawnmenu_tab_icon:GetBool() ) then
 					local icon_pan = vgui.Create( 'DButton', tab_panel_sp )
-					icon_pan:SetWide( 22 )
+					icon_pan:SetWide( 24 )
 
-					tabs_panel.user_wide = tabs_panel.user_wide + 26
+					tabs_panel.user_wide = tabs_panel.user_wide + 28
 
 					local IconMat = Material( tab.Icon )
 
