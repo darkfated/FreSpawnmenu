@@ -1008,7 +1008,7 @@ hook.Add( 'OnTextEntryLoseFocus', 'FreSpawnMenuFocusOff', function( pnl )
 	end
 end )
 
-// Console command to recreate the menu
+// Console commands
 
 concommand.Add( 'frespawnmenu_rebuild', function()
 	if ( IsValid( FreSpawnMenu ) ) then
@@ -1020,6 +1020,18 @@ concommand.Add( 'frespawnmenu_rebuild', function()
 
 		FreSpawnMenu = nil
 	end
+end )
+
+concommand.Add( 'frespawnmenu_reset_data', function()
+	if ( file.Exists( 'frespawnmenu_tabs.txt', 'DATA' ) ) then
+		file.Delete( 'frespawnmenu_tabs.txt' )
+	end
+
+	if ( file.Exists( 'frespawnmenu_fav_tools.json', 'DATA' ) ) then
+		file.Delete( 'frespawnmenu_fav_tools.json' )
+	end
+
+	RunConsoleCommand( 'frespawnmenu_rebuild' )
 end )
 
 // Custom menu settings
@@ -1068,5 +1080,7 @@ hook.Add( 'PopulateToolMenu', 'FreSpawnMenuTool', function()
 		for skin, skindata in pairs( derma.SkinList ) do
 			SkinChanger:AddChoice( skindata.PrintName, skin )
 		end
+
+		panel:AddControl( 'Button', { Label = '#frespawnmenu.tool.reset_data', Command = 'frespawnmenu_reset_data' } )
 	end )
 end )
