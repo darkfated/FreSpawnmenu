@@ -254,10 +254,10 @@ local function openFreMenu()
 		panel:AddOption( '#frespawnmenu.not_display', function()
 			soundPlay()
 
-			if ( table.HasValue( data_tabs.notvisible, name_tab ) ) then
+			if ( data_tabs.notvisible[ name_tab ] ) then
 				table.remove( data_tabs.notvisible, k )
 			else
-				table.insert( data_tabs.notvisible, name_tab )
+				data_tabs.notvisible[ #data_tabs.notvisible + 1 ] = name_tab
 			end
 
 			file.Write( 'frespawnmenu_tabs.txt', util.TableToJSON( data_tabs ) )
@@ -760,7 +760,7 @@ local function openFreMenu()
 
 		local favorites_tool = util.JSONToTable( file.Read( 'frespawnmenu_fav_tools.json', 'DATA' ) or '[]' )
 
-		if ( table.Count( favorites_tool ) != 0 ) then
+		if ( #favorites_tool != 0 ) then
 			local fav_option = DM:AddOption( '#frespawnmenu.favourites', function()
 				ClickToCreateFavTools()
 			end )
