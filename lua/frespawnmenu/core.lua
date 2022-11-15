@@ -48,6 +48,17 @@ local function openFreMenu()
 
 	achievements.SpawnMenuOpen()
 
+	if ( FatedUI != nil ) then
+		local frespawnmenu_fatedui = CreateClientConVar( 'frespawnmenu_fatedui', 0, true )
+
+		if ( !frespawnmenu_fatedui:GetBool() ) then
+			timer.Simple( 1, function()
+				chat.AddText( color_white, '#frespawnmenu.fated_ui' )
+				chat.PlaySound()
+			end )
+		end
+	end
+
 	if ( !file.Exists( 'frespawnmenu_tabs.txt', 'DATA' ) ) then
 		local data_tabs = {}
 		data_tabs.renamed = {}
@@ -67,33 +78,41 @@ local function openFreMenu()
 	end
 
 	if ( frespawnmenu_frame:GetBool() ) then
-		FreSpawnMenu = vgui.Create( 'DFrame' )
+		FreSpawnMenu = vgui.Create( FatedUI != nil and 'fu-frame' or 'DFrame' )
 		FreSpawnMenu:SetTitle( 'FreSpawnMenu' )
 
-		if ( GetConVar( 'frespawnmenu_frame_blur' ):GetBool() ) then
-			FreSpawnMenu:SetBackgroundBlur( true )
-		end
+		if ( FatedUI == nil ) then
+			if ( GetConVar( 'frespawnmenu_frame_blur' ):GetBool() ) then
+				FreSpawnMenu:SetBackgroundBlur( true )
+			end
+	
+			FreSpawnMenu:SetScreenLock( true )
 
-		FreSpawnMenu:SetScreenLock( true )
-		FreSpawnMenu.btnMaxim:SetDisabled( false )
-		FreSpawnMenu.btnMaxim.DoClick = function()
-			soundPlay( frespawnmenu_custom_sound:GetBool() and 'frespawnmenu/frame_full.ogg' )
-
-			if ( FreSpawnMenu:GetWide() == scrw ) then
-				spawnmenu_set_standart_size()
-			else
-				FreSpawnMenu:SetSize( scrw, scrh )
+			FreSpawnMenu.btnMaxim:SetDisabled( false )
+			FreSpawnMenu.btnMaxim.DoClick = function()
+				soundPlay( frespawnmenu_custom_sound:GetBool() and 'frespawnmenu/frame_full.ogg' )
+	
+				if ( FreSpawnMenu:GetWide() == scrw ) then
+					spawnmenu_set_standart_size()
+				else
+					FreSpawnMenu:SetSize( scrw, scrh )
+				end
+	
+				FreSpawnMenu:Center()
 			end
 
-			FreSpawnMenu:Center()
-		end
-		FreSpawnMenu.btnClose.DoClick = function()
-			soundPlay( frespawnmenu_custom_sound:GetBool() and 'frespawnmenu/frame_close.ogg' )
-
-			FreSpawnMenu:Remove()
+			FreSpawnMenu.btnClose.DoClick = function()
+				soundPlay( frespawnmenu_custom_sound:GetBool() and 'frespawnmenu/frame_close.ogg' )
+	
+				FreSpawnMenu:Remove()
+			end
 		end
 	else
 		FreSpawnMenu = vgui.Create( 'EditablePanel' )
+	end
+
+	if ( FatedUI != nil ) then
+		FreSpawnMenu.fatedui = true
 	end
 
 	spawnmenu_set_standart_size()
@@ -1067,6 +1086,11 @@ hook.Add( 'PopulateToolMenu', 'FreSpawnMenuTool', function()
 		panel:AddControl( 'Button', { Label = '#frespawnmenu.tool.rebuild', Command = 'frespawnmenu_rebuild' } )
 
 		panel:AddControl( 'Header', { Description = '#frespawnmenu.tool.rebuild_info' } )
+
+		if ( FreSpawnMenu.fatedui ) then
+			panel:AddControl( 'CheckBox', { Label = 'FatedUI', Command = 'frespawnmenu_fatedui' } )
+		end
+		
 		panel:AddControl( 'CheckBox', { Label = '#frespawnmenu.tool.window', Command = 'frespawnmenu_frame' } )
 
 		if ( frespawnmenu_frame:GetBool() ) then
