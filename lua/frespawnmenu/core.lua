@@ -22,9 +22,9 @@ CreateClientConVar('frespawnmenu_sounds', 1, true)
 
 local color_white = Color(255,255,255)
 local color_gray = Color(70,70,70,200)
-local color_panel = Color(202,202,202,200)
 local color_icon_depressed = Color(230,230,230)
 local color_panel_tool_content = Color(255,255,255,145)
+local color_dark_panel_tool_content = Color(58,58,58,220)
 local scrw, scrh = ScrW(), ScrH()
 
 local function freOutlinedBox(x, y, w, h, col, bordercol)
@@ -53,9 +53,13 @@ local function openFreMenu()
 
 		if !frespawnmenu_fatedui:GetBool() then
 			timer.Simple(1, function()
-				chat.AddText(color_white, '#frespawnmenu.fated_ui')
+				chat.AddText(color_white, language.GetPhrase('frespawnmenu.fated_ui'))
 				chat.PlaySound()
 			end)
+			
+			FatedUI.spawnmenu = nil
+		else
+			FatedUI.spawnmenu = true
 		end
 	end
 
@@ -78,10 +82,10 @@ local function openFreMenu()
 	end
 
 	if frespawnmenu_frame:GetBool() then
-		FreSpawnMenu = vgui.Create(FatedUI != nil and 'fu-frame' or 'DFrame')
+		FreSpawnMenu = vgui.Create(FatedUI.spawnmenu and 'fu-frame' or 'DFrame')
 		FreSpawnMenu:SetTitle('FreSpawnMenu')
 
-		if FatedUI == nil then
+		if !FatedUI.spawnmenu then
 			if GetConVar('frespawnmenu_frame_blur'):GetBool() then
 				FreSpawnMenu:SetBackgroundBlur(true)
 			end
@@ -109,10 +113,6 @@ local function openFreMenu()
 		end
 	else
 		FreSpawnMenu = vgui.Create('EditablePanel')
-	end
-
-	if FatedUI != nil then
-		FreSpawnMenu.fatedui = true
 	end
 
 	spawnmenu_set_standart_size()
@@ -616,7 +616,7 @@ local function openFreMenu()
 
 	local function drawLiteToolBackground(pnl)
 		pnl.Paint = function(_, w, h)
-			draw.RoundedBox(6, 0, 0, w, h, color_panel_tool_content)
+			draw.RoundedBox(6, 0, 0, w, h, menu_skin == 'fsm_dark' and color_dark_panel_tool_content or color_panel_tool_content)
 		end
 	end
 
@@ -1087,13 +1087,13 @@ hook.Add('PopulateToolMenu', 'FreSpawnMenuTool', function()
 
 		panel:AddControl('Header', {Description = '#frespawnmenu.tool.rebuild_info'})
 
-		if FreSpawnMenu.fatedui then
+		if FatedUI != nil then
 			panel:AddControl('CheckBox', {Label = 'FatedUI', Command = 'frespawnmenu_fatedui'})
 		end
 		
 		panel:AddControl('CheckBox', {Label = '#frespawnmenu.tool.window', Command = 'frespawnmenu_frame'})
 
-		if frespawnmenu_frame:GetBool() then
+		if frespawnmenu_frame:GetBool() and !FatedUI.spawnmenu then
 			panel:AddControl('CheckBox', {Label = '#frespawnmenu.tool.frame_blur', Command = 'frespawnmenu_frame_blur'})
 		end
 

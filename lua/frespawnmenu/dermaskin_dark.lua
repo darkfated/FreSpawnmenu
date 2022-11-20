@@ -2,10 +2,10 @@ local surface = surface
 local Color = Color
 local mat = Material('pp/blurscreen')
 local color_white = Color(255,255,255)
-local color_button_outline = Color(70,70,70,200)
-local color_blue = Color(47,96,255)
-local color_button = Color(226,226,226)
-local color_bluepurpl = Color(113,44,250)
+local color_button_outline = Color(241,241,241,100)
+local color_blue = Color(124,155,255)
+local color_button = Color(49,49,49)
+local color_bluepurpl = Color(161,115,255)
 local color_icon_depressed = Color(230,230,230)
 local scrw, scrh = ScrW(), ScrH()
 
@@ -42,16 +42,16 @@ end
 
 SKIN = {}
 
-SKIN.PrintName = 'FreSpawnMenu Skin'
+SKIN.PrintName = 'FreSpawnMenu Dark Skin'
 SKIN.Author = 'DarkFated'
 SKIN.DermaVersion = 1.1
-SKIN.GwenTexture = Material('gwenskin/frespawnmenu_skin.png')
+SKIN.GwenTexture = Material('gwenskin/frespawnmenu_dark_skin.png')
 
 SKIN.text_dark = Color(0,0,0,255)
 SKIN.colTextEntryText = Color(0,0,0,255)
 SKIN.colTextEntryTextHighlight = Color(0,120,215,255)
 SKIN.colTextEntryTextCursor = Color(0,0,0,255)
-SKIN.colTextEntryTextPlaceholder = Color(109, 109, 109, 255)
+SKIN.colTextEntryTextPlaceholder = Color(109,109,109,255)
 
 SKIN.tex = {}
 
@@ -339,7 +339,7 @@ end
 --[[---------------------------------------------------------
 	Tree
 -----------------------------------------------------------]]
-local color_panel_tree = Color(255,255,255,145)
+local color_panel_tree = Color(37,37,37,145)
 
 function SKIN:PaintTree(panel, w, h)
 	draw.RoundedBox(6, 0, 0, w, h, color_panel_tree)
@@ -412,7 +412,7 @@ end
 --[[---------------------------------------------------------
 	Menu
 -----------------------------------------------------------]]
-local color_panel_dm = Color(230,230,230)
+local color_panel_dm = Color(56,56,56)
 
 function SKIN:PaintMenu(panel, w, h)
 	draw.RoundedBox(4, 0, 0, w, h, color_button_outline)
@@ -859,4 +859,4 @@ function SKIN:PaintMenuBar(panel, w, h)
 	self.tex.Menu_Strip(0, 0, w, h)
 end
 
-derma.DefineSkin('fsm', 'Derma Skin for FreSpawnMenu', SKIN)
+derma.DefineSkin('fsm_dark', 'Dark Derma Skin for FreSpawnMenu', SKIN)

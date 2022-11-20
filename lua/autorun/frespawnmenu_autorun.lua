@@ -5,4 +5,5 @@ if ( SERVER ) then
 end
 
 inc( 'frespawnmenu/dermaskin.lua' )
+inc( 'frespawnmenu/dermaskin_dark.lua' )
 inc( 'frespawnmenu/core.lua' )
