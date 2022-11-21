@@ -82,10 +82,10 @@ local function openFreMenu()
 	end
 
 	if frespawnmenu_frame:GetBool() then
-		FreSpawnMenu = vgui.Create(FatedUI.spawnmenu and 'fu-frame' or 'DFrame')
+		FreSpawnMenu = vgui.Create(FatedUI != nil and FatedUI != nil and FatedUI.spawnmenu and 'fu-frame' or 'DFrame')
 		FreSpawnMenu:SetTitle('FreSpawnMenu')
 
-		if !FatedUI.spawnmenu then
+		if FatedUI != nil and !FatedUI.spawnmenu then
 			if GetConVar('frespawnmenu_frame_blur'):GetBool() then
 				FreSpawnMenu:SetBackgroundBlur(true)
 			end
@@ -1093,7 +1093,7 @@ hook.Add('PopulateToolMenu', 'FreSpawnMenuTool', function()
 		
 		panel:AddControl('CheckBox', {Label = '#frespawnmenu.tool.window', Command = 'frespawnmenu_frame'})
 
-		if frespawnmenu_frame:GetBool() and !FatedUI.spawnmenu then
+		if frespawnmenu_frame:GetBool() and FatedUI != nil and !FatedUI.spawnmenu then
 			panel:AddControl('CheckBox', {Label = '#frespawnmenu.tool.frame_blur', Command = 'frespawnmenu_frame_blur'})
 		end
 
