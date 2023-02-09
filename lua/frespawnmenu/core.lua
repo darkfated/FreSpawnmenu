@@ -14,6 +14,7 @@ local frespawnmenu_tool_drawer = CreateClientConVar('frespawnmenu_tool_drawer', 
 local frespawnmenu_fav_startup = CreateClientConVar('frespawnmenu_fav_startup', 0, true)
 local frespawnmenu_frame = CreateClientConVar('frespawnmenu_frame', 0, true)
 local frespawnmenu_quick_category_buttons = CreateClientConVar('frespawnmenu_quick_category_buttons', 0, true)
+local frespawnmenu_font = CreateClientConVar('frespawnmenu_font', 'DermaDefault', true)
 
 CreateClientConVar('frespawnmenu_blur', 1, true)
 CreateClientConVar('frespawnmenu_adaptive_wide_nav', 1, true)
@@ -42,6 +43,13 @@ local function soundPlay(snd)
 
 	surface.PlaySound(!snd and 'UI/buttonclickrelease.wav' or snd)
 end
+
+surface.CreateFont('FreSpawnMenu-Main', {
+	font = 'Montserrat Medium',
+	size = 15,
+	weight = 500,
+	extended = true,
+})
 
 local function openFreMenu()
 	scrw, scrh = ScrW(), ScrH() -- Resetting the permission when recreating the menu
@@ -121,6 +129,7 @@ local function openFreMenu()
 	FreSpawnMenu:MakePopup()
 	FreSpawnMenu:SetSkin(menu_skin)
 	FreSpawnMenu:SetKeyboardInputEnabled(false)
+	FreSpawnMenu.font = frespawnmenu_font:GetString()
 
 	function FreSpawnMenu:StartKeyFocus(pPanel)
 		self.m_pKeyFocus = pPanel
@@ -146,7 +155,7 @@ local function openFreMenu()
 		end
 
 		for k, tab in pairs(FreSpawnMenu.Tabs) do
-			FreSpawnMenu.Tabs[ k ].Panel:SetVisible(false)
+			FreSpawnMenu.Tabs[k].Panel:SetVisible(false)
 		end
 	end
 
@@ -190,13 +199,13 @@ local function openFreMenu()
 
 	if frespawnmenu_tool_right:GetBool() then
 		global_div:SetLeft(MainPanel)
-		global_div:SetLeftWidth(spawn_w - 160)
+		global_div:SetLeftWidth(spawn_w - 180)
 		global_div:SetLeftMin(spawn_w * 0.8)
 		global_div:SetRight(ToolPanel)
 		global_div:SetRightMin(120)
 	else
 		global_div:SetLeft(ToolPanel)
-		global_div:SetLeftWidth(160)
+		global_div:SetLeftWidth(180)
 		global_div:SetLeftMin(120)
 		global_div:SetRight(MainPanel)
 		global_div:SetRightMin(spawn_w * 0.8)
@@ -249,18 +258,18 @@ local function openFreMenu()
 	end
 
 	local function TabEditionOptions(panel, name_tab)
-		panel:AddOption('#frespawnmenu.rename', function()
+		local option_rename = panel:AddOption('#frespawnmenu.rename', function()
 			soundPlay()
 
 			Derma_StringRequest(
 				'FreSpawnMenu',
 				'#frespawnmenu.rename_description',
-				data_tabs.renamed[ name_tab ] and data_tabs.renamed[ name_tab ] or '',
+				data_tabs.renamed[name_tab] and data_tabs.renamed[name_tab] or '',
 				function(text)
 					if text != '' then
-						data_tabs.renamed[ name_tab ] = text
+						data_tabs.renamed[name_tab] = text
 					else
-						table.RemoveByValue(data_tabs.renamed, data_tabs.renamed[ name_tab ])
+						table.RemoveByValue(data_tabs.renamed, data_tabs.renamed[name_tab])
 					end
 
 					file.Write('frespawnmenu_tabs.txt', util.TableToJSON(data_tabs))
@@ -268,25 +277,29 @@ local function openFreMenu()
 					FreSpawnMenu:Remove()
 				end
 			):SetSkin(menu_skin)
-		end):SetIcon('icon16/book_edit.png')
+		end)
+		option_rename:SetIcon('icon16/book_edit.png')
+		option_rename:SetFont(FreSpawnMenu.font)
 
-		panel:AddOption('#frespawnmenu.not_display', function()
+		local option_not_display = panel:AddOption('#frespawnmenu.not_display', function()
 			soundPlay()
 
-			if data_tabs.notvisible[ name_tab ] then
+			if data_tabs.notvisible[name_tab] then
 				table.remove(data_tabs.notvisible, k)
 			else
-				data_tabs.notvisible[ #data_tabs.notvisible + 1 ] = name_tab
+				data_tabs.notvisible[#data_tabs.notvisible + 1] = name_tab
 			end
 
 			file.Write('frespawnmenu_tabs.txt', util.TableToJSON(data_tabs))
 
 			FreSpawnMenu:Remove()
-		end):SetIcon('icon16/camera.png')
+		end)
+		option_not_display:SetIcon('icon16/camera.png')
+		option_not_display:SetFont(FreSpawnMenu.font)
 	end
 
 	local function OpenContent(tab_id)
-		local TabTable = FreSpawnMenu.Tabs[ tab_id ]
+		local TabTable = FreSpawnMenu.Tabs[tab_id]
 
 		if frespawnmenu_content:GetString() == TabTable.Title then
 			return
@@ -311,9 +324,9 @@ local function openFreMenu()
 			elem.num = tab_num
 
 			if !table.HasValue(data_tabs.notvisible, name_tab) then
-				local ChildOption, ParentOption = DM:AddSubMenu(data_tabs.renamed[ name_tab ] and data_tabs.renamed[ name_tab ] or name_tab, function()
+				local ChildOption, ParentOption = DM:AddSubMenu(data_tabs.renamed[name_tab] and data_tabs.renamed[name_tab] or name_tab, function()
 					if sheet then
-						local new_tab = sheet:GetItems()[ elem.num ].Tab
+						local new_tab = sheet:GetItems()[elem.num].Tab
 
 						if sheet:GetActiveTab() == new_tab then
 							return
@@ -329,6 +342,7 @@ local function openFreMenu()
 					end
 				end)
 				ParentOption:SetIcon(elem.Icon)
+				ParentOption:SetFont(FreSpawnMenu.font)
 				ParentOption.right_clicked = false
 				ParentOption.DoRightClick = function()
 					if !ParentOption.right_clicked then
@@ -350,7 +364,7 @@ local function openFreMenu()
 
 		for name_tab, elem in SortedPairsByMemberValue(spawnmenu_tabs, 'Order') do
 			if table.HasValue(data_tabs.notvisible, name_tab) then
-				DM:AddOption(name_tab, function()
+				local tab_notvisible = DM:AddOption(name_tab, function()
 					soundPlay()
 
 					for k, tab in pairs(data_tabs.notvisible) do
@@ -362,7 +376,9 @@ local function openFreMenu()
 					file.Write('frespawnmenu_tabs.txt', util.TableToJSON(data_tabs))
 
 					FreSpawnMenu:Remove()
-				end):SetIcon(elem.Icon)
+				end)
+				tab_notvisible:SetIcon(elem.Icon)
+				tab_notvisible:SetFont(FreSpawnMenu.font)
 			end
 		end
 
@@ -375,7 +391,7 @@ local function openFreMenu()
 		tab_panel_sp:DockMargin(6, 6, 6, 6)
 		tab_panel_sp:SetOverlap(-4)
 
-		surface.SetFont('Default')
+		surface.SetFont(FreSpawnMenu.font)
 
 		local tab_num = 0
 
@@ -383,8 +399,8 @@ local function openFreMenu()
 			tab_num = tab_num + 1
 			tab.num = tab_num
 
-			if data_tabs.renamed[ name ] then
-				name = data_tabs.renamed[ name ]
+			if data_tabs.renamed[name] then
+				name = data_tabs.renamed[name]
 			end
 
 			local Tab = {}
@@ -428,6 +444,7 @@ local function openFreMenu()
 
 				btn_item:SetWide(btn_item_wide)
 				btn_item:SetText(name)
+				btn_item:SetFont(FreSpawnMenu.font)
 
 				tabs_panel.user_wide = tabs_panel.user_wide + btn_item_wide + 4
 
@@ -438,6 +455,7 @@ local function openFreMenu()
 				if frespawnmenu_tab_icon:GetBool() then
 					local icon_pan = vgui.Create('DButton', tab_panel_sp)
 					icon_pan:SetWide(24)
+					icon_pan:SetFont(FreSpawnMenu.font)
 
 					tabs_panel.user_wide = tabs_panel.user_wide + 28
 
@@ -500,7 +518,7 @@ local function openFreMenu()
 			DM:Hide()
 			DM:SetSkin(menu_skin)
 
-			self.Menus[ label ] = DM
+			self.Menus[label] = DM
 
 			local b = self:Add('DButton')
 			b:SetText(label)
@@ -508,6 +526,7 @@ local function openFreMenu()
 			b:DockMargin(5, 0, 0, 0)
 			b:SetIsMenu(true)
 			b:SetPaintBackground(false)
+			b:SetFont(FreSpawnMenu.font)
 			b:SizeToContentsX(16)
 			b.DoClick = function()
 				if DM:IsVisible() then
@@ -543,7 +562,7 @@ local function openFreMenu()
 			local ContextMenu = mb:AddMenu('ContextMenu')
 
 			for k, context_item in pairs(list.Get('DesktopWindows')) do
-				ContextMenu:AddOption(context_item.title, function()
+				local contentmenu_tab = ContextMenu:AddOption(context_item.title, function()
 					HideTabs()
 
 					FreSpawnMenu.ContextMode = true
@@ -572,6 +591,7 @@ local function openFreMenu()
 
 					context_item.init(context_item.icon or nil, ContextMenu_Window)
 				end)
+				contentmenu_tab:SetFont(FreSpawnMenu.font)
 			end
 		end
 
@@ -611,6 +631,7 @@ local function openFreMenu()
 	local tool_CategoryButton = vgui.Create('DButton', tool_CategoryPanel)
 	tool_CategoryButton:Dock(FILL)
 	tool_CategoryButton:SetText('#frespawnmenu.categories')
+	tool_CategoryButton:SetFont(FreSpawnMenu.font)
 
 	local tool_cp_sp_panel = vgui.Create('DPanel', action_panel_div)
 
@@ -658,6 +679,7 @@ local function openFreMenu()
 		local tool_btn = vgui.Create('DButton', category)
 		tool_btn:Dock(TOP)
 		tool_btn:SetText(tool.Text)
+		tool_btn:SetFont(FreSpawnMenu.font)
 
 		local cnt = tool.Controls
 		local name = tool.ItemName
@@ -701,6 +723,7 @@ local function openFreMenu()
 				end)
 				fav.Paint = nil
 				fav:SetIcon('icon16/star.png')
+				fav:SetFont(FreSpawnMenu.font)
 			else
 				local remove_fav = DM:AddOption('#frespawnmenu.fav_remove', function()
 					soundPlay('garrysmod/content_downloaded.wav')
@@ -713,6 +736,7 @@ local function openFreMenu()
 				end)
 				remove_fav.Paint = nil
 				remove_fav:SetIcon('icon16/cross.png')
+				remove_fav:SetFont(FreSpawnMenu.font)
 			end
 
 			DM:Open()
@@ -772,6 +796,7 @@ local function openFreMenu()
 				tools_create(tool, category_id)
 			end)
 			btn:SetIcon(tool.Icon)
+			btn:SetFont(FreSpawnMenu.font)
 			btn.Paint = nil
 		end
 
@@ -785,6 +810,7 @@ local function openFreMenu()
 			end)
 			fav_option.Paint = nil
 			fav_option:SetIcon('icon16/star.png')
+			fav_option:SetFont(FreSpawnMenu.font)
 		end
 
 		DM:Open()
@@ -850,7 +876,7 @@ local function openFreMenu()
 
 	local save_tool_data = util.JSONToTable(frespawnmenu_save_tool:GetString())
 
-	tool_CategoryPanel.category_nav = save_tool_data[ 1 ]
+	tool_CategoryPanel.category_nav = save_tool_data[1]
 
 	if frespawnmenu_quick_category_buttons:GetBool() then
 		local save_tool_data = util.JSONToTable(frespawnmenu_save_tool:GetString())
@@ -879,10 +905,10 @@ local function openFreMenu()
 			else
 				soundPlay()
 
-				tool_PrevButton.nav_icon = Material(spawnmenu_tools[ tool_CategoryPanel.category_nav - 1 < 1 and 1 or tool_CategoryPanel.category_nav - 1 ].Icon)
-				tool_NextButton.nav_icon = Material(spawnmenu_tools[ tool_CategoryPanel.category_nav + 1 ].Icon)
+				tool_PrevButton.nav_icon = Material(spawnmenu_tools[tool_CategoryPanel.category_nav - 1 < 1 and 1 or tool_CategoryPanel.category_nav - 1].Icon)
+				tool_NextButton.nav_icon = Material(spawnmenu_tools[tool_CategoryPanel.category_nav + 1].Icon)
 
-				tools_create(spawnmenu_tools[ tool_CategoryPanel.category_nav ], tool_CategoryPanel.category_nav)
+				tools_create(spawnmenu_tools[tool_CategoryPanel.category_nav], tool_CategoryPanel.category_nav)
 			end
 		end
 
@@ -894,15 +920,15 @@ local function openFreMenu()
 			else
 				soundPlay()
 
-				tool_PrevButton.nav_icon = Material(spawnmenu_tools[ tool_CategoryPanel.category_nav - 1 ].Icon)
-				tool_NextButton.nav_icon = Material(spawnmenu_tools[ tool_CategoryPanel.category_nav + 1 > #spawnmenu_tools and #spawnmenu_tools or tool_CategoryPanel.category_nav + 1 ].Icon)
+				tool_PrevButton.nav_icon = Material(spawnmenu_tools[tool_CategoryPanel.category_nav - 1].Icon)
+				tool_NextButton.nav_icon = Material(spawnmenu_tools[tool_CategoryPanel.category_nav + 1 > #spawnmenu_tools and #spawnmenu_tools or tool_CategoryPanel.category_nav + 1].Icon)
 
-				tools_create(spawnmenu_tools[ tool_CategoryPanel.category_nav ], tool_CategoryPanel.category_nav)
+				tools_create(spawnmenu_tools[tool_CategoryPanel.category_nav], tool_CategoryPanel.category_nav)
 			end
 		end
 
-		tool_PrevButton.nav_icon = Material(spawnmenu_tools[ tool_CategoryPanel.category_nav - 1 < 1 and 1 or tool_CategoryPanel.category_nav - 1 ].Icon)
-		tool_NextButton.nav_icon = Material(spawnmenu_tools[ tool_CategoryPanel.category_nav + 1 > #spawnmenu_tools and #spawnmenu_tools or tool_CategoryPanel.category_nav + 1 ].Icon)
+		tool_PrevButton.nav_icon = Material(spawnmenu_tools[tool_CategoryPanel.category_nav - 1 < 1 and 1 or tool_CategoryPanel.category_nav - 1].Icon)
+		tool_NextButton.nav_icon = Material(spawnmenu_tools[tool_CategoryPanel.category_nav + 1 > #spawnmenu_tools and #spawnmenu_tools or tool_CategoryPanel.category_nav + 1].Icon)
 
 		tool_PrevButton.DoRightClick = function()
 			OpenCategoriesDM()
@@ -914,26 +940,26 @@ local function openFreMenu()
 
 	// Setting standard settings when opening for the first time
 
-	local active_category = spawnmenu_tools[ save_tool_data[ 1 ] ] or spawnmenu_tools[ 1 ]
-	local active_tool_category = active_category.Items[ save_tool_data[ 2 ] ] or active_category.Items[ 1 ]
-	local active_tool = active_tool_category[ save_tool_data[ 3 ] ] or active_tool_category[ 1 ]
+	local active_category = spawnmenu_tools[save_tool_data[1]] or spawnmenu_tools[1]
+	local active_tool_category = active_category.Items[save_tool_data[2]] or active_category.Items[1]
+	local active_tool = active_tool_category[save_tool_data[3]] or active_tool_category[1]
 
 	if frespawnmenu_fav_startup:GetBool() then
 		FavToolsCreate()
 	else
-		tools_create(active_category, save_tool_data[ 1 ])
+		tools_create(active_category, save_tool_data[1])
 	end
 
 	create_tool(active_tool)
 
 	if !frespawnmenu_simple_tabs:GetBool() then
 		for k, tab in pairs(FreSpawnMenu.Tabs) do
-			if data_tabs.renamed[ tab.Title ] then
-				tab.Title = data_tabs.renamed[ tab.Title ]
+			if data_tabs.renamed[tab.Title] then
+				tab.Title = data_tabs.renamed[tab.Title]
 			end
 
 			if tab.Title == frespawnmenu_content:GetString() then
-				FreSpawnMenu.Tabs[ k ].Panel:SetVisible(true)
+				FreSpawnMenu.Tabs[k].Panel:SetVisible(true)
 			end
 		end
 	else
@@ -959,8 +985,8 @@ local function openFreMenu()
 				TabsSheet:SetActiveTab(tab_par.Tab)
 			end
 
-			if data_tabs.renamed[ tab_par.Name ] then
-				tab_par.Tab:SetText(data_tabs.renamed[ tab_par.Name ])
+			if data_tabs.renamed[tab_par.Name] then
+				tab_par.Tab:SetText(data_tabs.renamed[tab_par.Name])
 			end
 
 			tab_par.Tab.DoRightClick = function()
@@ -1116,6 +1142,7 @@ hook.Add('PopulateToolMenu', 'FreSpawnMenuTool', function()
 		SkinChanger:Dock(TOP)
 		SkinChanger:DockMargin(10, 8, 10, 0)
 		SkinChanger:SetValue(frespawnmenu_derma_skin:GetString())
+		SkinChanger:SetFont(FreSpawnMenu.font)
 		SkinChanger.OnSelect = function(_, _, _, data)
 			RunConsoleCommand('frespawnmenu_derma_skin', data)
 			RunConsoleCommand('frespawnmenu_rebuild')
@@ -1123,6 +1150,22 @@ hook.Add('PopulateToolMenu', 'FreSpawnMenuTool', function()
 
 		for skin, skindata in pairs(derma.SkinList) do
 			SkinChanger:AddChoice(skindata.PrintName, skin)
+		end
+
+		panel:AddControl('Header', {Description = '#frespawnmenu.font' .. ':'})
+
+		local FontChanger = vgui.Create('DComboBox', panel)
+		FontChanger:Dock(TOP)
+		FontChanger:DockMargin(10, 8, 10, 0)
+		FontChanger:SetValue(frespawnmenu_font:GetString())
+		FontChanger:SetFont(FreSpawnMenu.font)
+		FontChanger.OnSelect = function(_, _, _, data)
+			RunConsoleCommand('frespawnmenu_font', data)
+			RunConsoleCommand('frespawnmenu_rebuild')
+		end
+
+		for k, font in pairs({'Trebuchet18', 'DermaDefault', 'Default', 'FreSpawnMenu-Main'}) do
+			FontChanger:AddChoice(font, font)
 		end
 
 		panel:AddControl('Button', {Label = '#frespawnmenu.tool.reset_data', Command = 'frespawnmenu_reset_data'})
