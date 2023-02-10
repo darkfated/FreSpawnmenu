@@ -1152,7 +1152,7 @@ hook.Add('PopulateToolMenu', 'FreSpawnMenuTool', function()
 			SkinChanger:AddChoice(skindata.PrintName, skin)
 		end
 
-		panel:AddControl('Header', {Description = '#frespawnmenu.font' .. ':'})
+		panel:AddControl('Header', {Description = '#frespawnmenu.font'})
 
 		local FontChanger = vgui.Create('DComboBox', panel)
 		FontChanger:Dock(TOP)
