@@ -1124,7 +1124,7 @@ hook.Add('PopulateToolMenu', 'FreSpawnMenuTool', function()
 		end
 
 		panel:AddControl('CheckBox', {Label = '#frespawnmenu.tool.menubar', Command = 'frespawnmenu_menubar'})
-		panel:AddControl('Slider', {Label = '#frespawnmenu.tool.size', Command = 'frespawnmenu_size', Min = 0.5, Max = 1.05, Type = 'float'})
+		panel:AddControl('Slider', {Label = '#frespawnmenu.tool.size', Command = 'frespawnmenu_size', Min = 0.5, Max = 1.15, Type = 'float'})
 		panel:AddControl('CheckBox', {Label = '#frespawnmenu.tool.tab_icon', Command = 'frespawnmenu_tab_icon'})
 		panel:AddControl('CheckBox', {Label = '#frespawnmenu.tool.simple_tabs', Command = 'frespawnmenu_simple_tabs'})
 
