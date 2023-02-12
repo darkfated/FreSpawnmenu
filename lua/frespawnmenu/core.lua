@@ -15,6 +15,7 @@ local frespawnmenu_fav_startup = CreateClientConVar('frespawnmenu_fav_startup', 
 local frespawnmenu_frame = CreateClientConVar('frespawnmenu_frame', 0, true)
 local frespawnmenu_quick_category_buttons = CreateClientConVar('frespawnmenu_quick_category_buttons', 0, true)
 local frespawnmenu_font = CreateClientConVar('frespawnmenu_font', 'DermaDefault', true)
+local frespawnmenu_fatedui = CreateClientConVar('frespawnmenu_fatedui', 0, true)
 
 CreateClientConVar('frespawnmenu_blur', 1, true)
 CreateClientConVar('frespawnmenu_adaptive_wide_nav', 1, true)
@@ -44,31 +45,43 @@ local function soundPlay(snd)
 	surface.PlaySound(!snd and 'UI/buttonclickrelease.wav' or snd)
 end
 
-surface.CreateFont('FreSpawnMenu-Main', {
-	font = 'Montserrat Medium',
-	size = 15,
-	weight = 500,
-	extended = true,
-})
-
 local function openFreMenu()
 	scrw, scrh = ScrW(), ScrH() -- Resetting the permission when recreating the menu
+
+	function fw(wide)
+		return (FatedUI != nil and frespawnmenu_fatedui:GetBool()) and FatedUI.func.w(wide) or wide
+	end
+	
+	function fh(tall)
+		return (FatedUI != nil and frespawnmenu_fatedui:GetBool()) and FatedUI.func.h(tall) or tall
+	end
+
+	surface.CreateFont('FreSpawnMenu-Main', {
+		font = 'Montserrat Medium',
+		size = fh(15),
+		weight = fw(500),
+		extended = true,
+	})
 
 	achievements.SpawnMenuOpen()
 
 	if FatedUI != nil then
-		local frespawnmenu_fatedui = CreateClientConVar('frespawnmenu_fatedui', 0, true)
-
 		if !frespawnmenu_fatedui:GetBool() then
 			timer.Simple(1, function()
 				chat.AddText(color_white, language.GetPhrase('frespawnmenu.fated_ui'))
 				chat.PlaySound()
 			end)
-			
+
 			FatedUI.spawnmenu = nil
 		else
 			FatedUI.spawnmenu = true
 		end
+	elseif scrw > 1920 then
+		timer.Simple(1, function()
+			chat.AddText(color_white, 'You have a resolution greater than 1920x1080. For a better display of the interface, install FatedUI')
+			chat.AddText(Color(84,138,255), 'https://steamcommunity.com/sharedfiles/filedetails/?id=2878418292')
+			chat.PlaySound()
+		end)
 	end
 
 	if !file.Exists('frespawnmenu_tabs.txt', 'DATA') then
@@ -161,7 +174,7 @@ local function openFreMenu()
 
 	local function SpawnMenuIconSelection(next_func, startup_icon)
 		FreSpawnMenu.IconSelection = vgui.Create('DFrame', FreSpawnMenu)
-		FreSpawnMenu.IconSelection:SetSize(188, 210)
+		FreSpawnMenu.IconSelection:SetSize(fw(188), fh(210))
 		FreSpawnMenu.IconSelection:Center()
 		FreSpawnMenu.IconSelection:MakePopup()
 		FreSpawnMenu.IconSelection:SetTitle('Icons')
@@ -176,7 +189,7 @@ local function openFreMenu()
 
 		local ConfirmButton = vgui.Create('DButton', FreSpawnMenu.IconSelection)
 		ConfirmButton:Dock(BOTTOM)
-		ConfirmButton:DockMargin(0, 4, 0, 0)
+		ConfirmButton:DockMargin(0, fh(4), 0, 0)
 		ConfirmButton.DoClick = function()
 			soundPlay()
 
@@ -189,7 +202,7 @@ local function openFreMenu()
 
 	local global_div = vgui.Create('DHorizontalDivider', FreSpawnMenu)
 	global_div:Dock(FILL)
-	global_div:SetDividerWidth(4)
+	global_div:SetDividerWidth(fw(4))
 
 	local MainPanel = vgui.Create('DPanel', global_div)
 	MainPanel:SetWide(spawn_w)
@@ -199,14 +212,14 @@ local function openFreMenu()
 
 	if frespawnmenu_tool_right:GetBool() then
 		global_div:SetLeft(MainPanel)
-		global_div:SetLeftWidth(spawn_w - 180)
+		global_div:SetLeftWidth(spawn_w - fw(180))
 		global_div:SetLeftMin(spawn_w * 0.8)
 		global_div:SetRight(ToolPanel)
-		global_div:SetRightMin(120)
+		global_div:SetRightMin(fw(120))
 	else
 		global_div:SetLeft(ToolPanel)
-		global_div:SetLeftWidth(180)
-		global_div:SetLeftMin(120)
+		global_div:SetLeftWidth(fw(180))
+		global_div:SetLeftMin(fw(120))
 		global_div:SetRight(MainPanel)
 		global_div:SetRightMin(spawn_w * 0.8)
 	end
@@ -216,7 +229,7 @@ local function openFreMenu()
 	local spawn_div = vgui.Create('DVerticalDivider', MainPanel)
 	spawn_div:SetWide(MainPanel:GetWide())
 	spawn_div:Dock(FILL)
-	spawn_div:SetDividerHeight(4)
+	spawn_div:SetDividerHeight(fh(4))
 
 	local tabs_panel = vgui.Create('DPanel', spawn_div)
 	tabs_panel.user_wide = 0
@@ -229,8 +242,8 @@ local function openFreMenu()
 
 	local action_panel_div = vgui.Create('DHorizontalDivider', action_panel)
 	action_panel_div:Dock(FILL)
-	action_panel_div:DockMargin(6, 6, 6, 6)
-	action_panel_div:SetDividerWidth(4)
+	action_panel_div:DockMargin(fw(6), fw(6), fw(6), fw(6))
+	action_panel_div:SetDividerWidth(fw(4))
 
 	local action_panel_content_scroll = vgui.Create('DHorizontalScroller', action_panel_div)
 
@@ -241,20 +254,20 @@ local function openFreMenu()
 	action_panel_content_scroll.Paint = function()
 		local convar_right = frespawnmenu_tool_right:GetBool()
 
-		if convar_right and action_panel_div:GetLeftWidth() < 400 or !convar_right and spawn_div:GetWide() - action_panel_div:GetLeftWidth() < 400 then
-			action_panel_content:SetWide(500)
+		if convar_right and action_panel_div:GetLeftWidth() < fw(400) or !convar_right and spawn_div:GetWide() - action_panel_div:GetLeftWidth() < fw(400) then
+			action_panel_content:SetWide(fw(500))
 		else
-			action_panel_content:SetWide(convar_right and action_panel_div:GetLeftWidth() or spawn_div:GetWide() - action_panel_div:GetLeftWidth() - 16)
+			action_panel_content:SetWide(convar_right and action_panel_div:GetLeftWidth() or spawn_div:GetWide() - action_panel_div:GetLeftWidth() - fw(16))
 		end
 	end
 
 	if frespawnmenu_tool_right:GetBool() then
 		action_panel_div:SetLeft(action_panel_content_scroll)
 		action_panel_div:SetLeftWidth(spawn_div:GetWide())
-		action_panel_div:SetRightMin(math.min(300, spawn_w * 0.32))
+		action_panel_div:SetRightMin(math.min(fw(300), spawn_w * 0.32))
 	else
 		action_panel_div:SetRight(action_panel_content_scroll)
-		action_panel_div:SetLeftMin(math.min(300, spawn_w * 0.32))
+		action_panel_div:SetLeftMin(math.min(fw(300), spawn_w * 0.32))
 	end
 
 	local function TabEditionOptions(panel, name_tab)
@@ -388,8 +401,8 @@ local function openFreMenu()
 	if !frespawnmenu_simple_tabs:GetBool() then
 		local tab_panel_sp = vgui.Create('DHorizontalScroller', tabs_panel)
 		tab_panel_sp:Dock(FILL)
-		tab_panel_sp:DockMargin(6, 6, 6, 6)
-		tab_panel_sp:SetOverlap(-4)
+		tab_panel_sp:DockMargin(fw(6), fw(6), fw(6), fw(6))
+		tab_panel_sp:SetOverlap(fw(-4))
 
 		surface.SetFont(FreSpawnMenu.font)
 
@@ -440,13 +453,13 @@ local function openFreMenu()
 
 				local btn_item = vgui.Create('DButton', tab_panel_sp)
 
-				local btn_item_wide = size_name + 10 + btn_item:GetTall()
+				local btn_item_wide = size_name + fw(10) + btn_item:GetTall()
 
 				btn_item:SetWide(btn_item_wide)
 				btn_item:SetText(name)
 				btn_item:SetFont(FreSpawnMenu.font)
 
-				tabs_panel.user_wide = tabs_panel.user_wide + btn_item_wide + 4
+				tabs_panel.user_wide = tabs_panel.user_wide + btn_item_wide + fw(4)
 
 				TabClick(btn_item)
 
@@ -454,10 +467,10 @@ local function openFreMenu()
 
 				if frespawnmenu_tab_icon:GetBool() then
 					local icon_pan = vgui.Create('DButton', tab_panel_sp)
-					icon_pan:SetWide(24)
+					icon_pan:SetWide(fw(24))
 					icon_pan:SetFont(FreSpawnMenu.font)
 
-					tabs_panel.user_wide = tabs_panel.user_wide + 28
+					tabs_panel.user_wide = tabs_panel.user_wide + fw(28)
 
 					local IconMat = Material(tab.Icon)
 
@@ -465,10 +478,10 @@ local function openFreMenu()
 					icon_pan.Paint = function(self, w, h)
 						surface.SetDrawColor(self.Depressed and frespawnmenu_content:GetString() != name and color_icon_depressed or color_white)
 						surface.SetMaterial(IconMat)
-						surface.DrawTexturedRect(4, h * 0.5 - 8, w - 8, 16)
+						surface.DrawTexturedRect(fw(4), h * 0.5 - fh(8), w - fw(8), fh(16))
 
 						if spawn_div:GetDragging() then
-							btn_item:SetWide(size_name + 10 + btn_item:GetTall())
+							btn_item:SetWide(size_name + fw(10) + btn_item:GetTall())
 						end
 					end
 
@@ -481,10 +494,10 @@ local function openFreMenu()
 			end
 		end
 
-		tabs_panel.user_wide = tabs_panel.user_wide + 16
+		tabs_panel.user_wide = tabs_panel.user_wide + fw(16)
 
 		local PanelEnd = vgui.Create('DPanel', tab_panel_sp)
-		PanelEnd:SetWide(4)
+		PanelEnd:SetWide(fw(4))
 		PanelEnd.Paint = function(_, w, h)
 			freOutlinedBox(0, 0, w, h, color_white, color_gray)
 		end
@@ -503,8 +516,8 @@ local function openFreMenu()
 	if frespawnmenu_menubar:GetBool() then
 		local panel_menubar = vgui.Create('DPanel', MainPanel)
 		panel_menubar:Dock(TOP)
-		panel_menubar:SetTall(30)
-		panel_menubar:DockMargin(0, 0, 0, 4)
+		panel_menubar:SetTall(fh(30))
+		panel_menubar:DockMargin(0, 0, 0, fh(4))
 		panel_menubar.user_wide = 0
 
 		local mb = vgui.Create('DMenuBar', panel_menubar)
@@ -523,7 +536,7 @@ local function openFreMenu()
 			local b = self:Add('DButton')
 			b:SetText(label)
 			b:Dock(LEFT)
-			b:DockMargin(5, 0, 0, 0)
+			b:DockMargin(fw(5), 0, 0, 0)
 			b:SetIsMenu(true)
 			b:SetPaintBackground(false)
 			b:SetFont(FreSpawnMenu.font)
@@ -551,7 +564,7 @@ local function openFreMenu()
 				b:DoClick()
 			end
 
-			panel_menubar.user_wide = panel_menubar.user_wide + b:GetWide() + 5
+			panel_menubar.user_wide = panel_menubar.user_wide + b:GetWide() + fw(5)
 
 			return DM
 		end
@@ -595,7 +608,7 @@ local function openFreMenu()
 			end
 		end
 
-		panel_menubar.user_wide = panel_menubar.user_wide + 5
+		panel_menubar.user_wide = panel_menubar.user_wide + fw(5)
 	end
 
 	spawn_div:SetTop(tabs_panel)
@@ -605,8 +618,8 @@ local function openFreMenu()
 		spawn_div:SetTopMax(0)
 		spawn_div:SetTopHeight(0)
 	else
-		spawn_div:SetTopMin(34)
-		spawn_div:SetTopMax(80)
+		spawn_div:SetTopMin(fh(34))
+		spawn_div:SetTopMax(fh(80))
 	end
 
 	spawn_div:SetTopHeight(spawn_div:GetTopMin())
@@ -616,7 +629,7 @@ local function openFreMenu()
 
 	local tool_sp = vgui.Create('DScrollPanel', ToolPanel)
 	tool_sp:Dock(FILL)
-	tool_sp:DockMargin(6, 6, 6, 6)
+	tool_sp:DockMargin(fw(6), fh(6), fw(6), fh(6))
 
 	if !frespawnmenu_scrollbar_tools:GetBool() then
 		tool_sp:GetVBar():SetWide(0)
@@ -624,8 +637,8 @@ local function openFreMenu()
 
 	local tool_CategoryPanel = vgui.Create('DPanel', ToolPanel)
 	tool_CategoryPanel:Dock(TOP)
-	tool_CategoryPanel:DockMargin(4, 4, 4, -2)
-	tool_CategoryPanel:SetTall(18)
+	tool_CategoryPanel:DockMargin(fw(4), fh(4), fw(4), fh(-2))
+	tool_CategoryPanel:SetTall(fh(18))
 	tool_CategoryPanel.Paint = nil
 
 	local tool_CategoryButton = vgui.Create('DButton', tool_CategoryPanel)
@@ -645,13 +658,13 @@ local function openFreMenu()
 	tool_cp_sp:Dock(FILL)
 
 	if !frespawnmenu_simple_tabs:GetBool() then
-		tool_cp_sp:DockMargin(2, 4, 2, 4)
+		tool_cp_sp:DockMargin(fw(2), fh(4), fw(2), fh(4))
 
 		drawLiteToolBackground(tool_cp_sp_panel)
 
 		tool_cp_sp.Paint = nil
 	else
-		tool_cp_sp:DockMargin(6, 6, 6, 6)
+		tool_cp_sp:DockMargin(fw(6), fh(6), fw(6), fh(6))
 
 		drawLiteToolBackground(tool_cp_sp)
 	end
@@ -663,14 +676,14 @@ local function openFreMenu()
 	end
 
 	local function create_tool(item)
-		local cp = vgui.Create('ControlPanel', tool_cp_sp)
+		local cp = vgui.Create('FreSpawnMenu-ControlPanel', tool_cp_sp)
 		cp:Dock(FILL)
 		cp:SetLabel(item.Text)
 
 		item.CPanelFunction(cp)
 
 		local PanSplit = vgui.Create('DPanel', cp)
-		PanSplit:SetTall(6)
+		PanSplit:SetTall(fh(6))
 		PanSplit:Dock(TOP)
 		PanSplit.Paint = nil
 	end
@@ -678,6 +691,7 @@ local function openFreMenu()
 	local function ToolAction(tool, fav_tools, category, item_data)
 		local tool_btn = vgui.Create('DButton', category)
 		tool_btn:Dock(TOP)
+		tool_btn:SetTall(fh(22))
 		tool_btn:SetText(tool.Text)
 		tool_btn:SetFont(FreSpawnMenu.font)
 
@@ -751,6 +765,7 @@ local function openFreMenu()
 		for category_num, category in ipairs(tool.Items) do
 			local CollapsibleTool = vgui.Create('DCollapsibleCategory', tool_sp)
 			CollapsibleTool:Dock(TOP)
+			CollapsibleTool:SetTall(fh(16))
 			CollapsibleTool:SetLabel(category.Text)
 
 			for item_num, item in ipairs(category) do
@@ -837,7 +852,7 @@ local function openFreMenu()
 
 		local DrawerContentPanel = vgui.Create('DPanel', DrawerPanel)
 		DrawerContentPanel:Dock(FILL)
-		DrawerContentPanel:DockMargin(6, 12, 6, 6)
+		DrawerContentPanel:DockMargin(fw(6), fh(12), fw(6), fh(6))
 		DrawerContentPanel.Paint = nil
 		DrawerContentPanel.num = 0
 
@@ -846,9 +861,9 @@ local function openFreMenu()
 			DrawerCheckbox:Dock(TOP)
 
 			if DrawerContentPanel.num > 0 then
-				DrawerCheckbox:DockMargin(0, 8, 0, 0)
+				DrawerCheckbox:DockMargin(0, fh(8), 0, 0)
 
-				ToolDrawer.tall = ToolDrawer.tall + 8
+				ToolDrawer.tall = ToolDrawer.tall + fh(8)
 			end
 
 			DrawerCheckbox:SetText(title)
@@ -862,7 +877,7 @@ local function openFreMenu()
 			end
 
 			DrawerContentPanel.num = DrawerContentPanel.num + 1
-			ToolDrawer.tall = ToolDrawer.tall + 15
+			ToolDrawer.tall = ToolDrawer.tall + fh(15)
 		end
 
 		CreateDrawerCheckBox('#frespawnmenu.tool.tool_right', 'frespawnmenu_tool_right')
@@ -883,18 +898,18 @@ local function openFreMenu()
 
 		local tool_NavigationPanel = vgui.Create('DPanel', tool_CategoryPanel)
 		tool_NavigationPanel:Dock(RIGHT)
-		tool_NavigationPanel:DockMargin(2, 0, 0, 0)
-		tool_NavigationPanel:SetWide(38)
+		tool_NavigationPanel:DockMargin(fw(2), 0, 0, 0)
+		tool_NavigationPanel:SetWide(fw(38))
 		tool_NavigationPanel.Paint = nil
 
 		local tool_PrevButton = vgui.Create('DButton', tool_NavigationPanel)
 		tool_PrevButton:Dock(LEFT)
-		tool_PrevButton:SetWide(18)
+		tool_PrevButton:SetWide(fw(18))
 		tool_PrevButton:SetText('')
 
 		local tool_NextButton = vgui.Create('DButton', tool_NavigationPanel)
 		tool_NextButton:Dock(RIGHT)
-		tool_NextButton:SetWide(18)
+		tool_NextButton:SetWide(fw(18))
 		tool_NextButton:SetText('')
 
 		tool_PrevButton.DoClick = function()
@@ -1140,7 +1155,8 @@ hook.Add('PopulateToolMenu', 'FreSpawnMenuTool', function()
 
 		local SkinChanger = vgui.Create('DComboBox', panel)
 		SkinChanger:Dock(TOP)
-		SkinChanger:DockMargin(10, 8, 10, 0)
+		SkinChanger:DockMargin(fw(10), fh(8), fw(10), 0)
+		SkinChanger:SetTall(fh(22))
 		SkinChanger:SetValue(frespawnmenu_derma_skin:GetString())
 		SkinChanger:SetFont(FreSpawnMenu.font)
 		SkinChanger.OnSelect = function(_, _, _, data)
@@ -1156,7 +1172,8 @@ hook.Add('PopulateToolMenu', 'FreSpawnMenuTool', function()
 
 		local FontChanger = vgui.Create('DComboBox', panel)
 		FontChanger:Dock(TOP)
-		FontChanger:DockMargin(10, 8, 10, 0)
+		FontChanger:DockMargin(fw(10), fh(8), fw(10), 0)
+		FontChanger:SetTall(fh(22))
 		FontChanger:SetValue(frespawnmenu_font:GetString())
 		FontChanger:SetFont(FreSpawnMenu.font)
 		FontChanger.OnSelect = function(_, _, _, data)

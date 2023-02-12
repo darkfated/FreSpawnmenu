@@ -289,11 +289,11 @@ function SKIN:PaintPanel(panel, w, h)
 
 	local adaptive_wide = GetConVar('frespawnmenu_adaptive_wide_nav'):GetBool()
 
-	if panel.user_wide == nil or !adaptive_wide or panel.user_wide != nil and h != 34 and h != 30 then
+	if panel.user_wide == nil or !adaptive_wide or panel.user_wide != nil and h != fh(34) and h != fh(30) then
 		Blur(panel)
 	end
 
-	self.tex.Panels.Normal(0, 0, adaptive_wide and (h == 34 or h == 30) and panel.user_wide or w, h, panel.m_bgColor)
+	self.tex.Panels.Normal(0, 0, adaptive_wide and (h == fh(34) or h == fh(30)) and panel.user_wide or w, h, panel.m_bgColor)
 end
 
 function SKIN:PaintShadow(panel, w, h)
