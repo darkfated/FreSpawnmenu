@@ -11,7 +11,7 @@
 | ![](https://raw.githubusercontent.com/yammadev/flag-icons/master/png/TR%402x.png) | Turkey |
 
 ## FatedUI 
-The FreSpawnMenu can be used with a third-party library. Thanks to this, he gets a few new opportunities. Therefore, we recommend [installing FatedUI](https://github.com/darkfated)
+The FreSpawnMenu can be used with a third-party library. Thanks to this, he gets a few new opportunities. Therefore, we recommend [installing FatedUI](https://github.com/darkfated/fatedui)
 
 ## What opportunities does it have ❤️
 > #### **General view**
